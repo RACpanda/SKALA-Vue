@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 
 // 날씨 데이터
@@ -25,11 +25,9 @@ const selectCity = (cityName) => {
 }
 
 // 상세보기
-const showDetail = (cityName, status, temp, humidaty) => {
+const showDetail = (cityName, status, temp, humidity) => {
   window.alert(
-    '${cityName}의 현재 날씨는 [${status}] 상태입니다.\n' +
-      '기온은 ${temp}도이고, \n' + 
-      '습도는 ${humidity}%입니다.')
+    `${cityName}의 현재 날씨는 [${status}] 상태입니다.\n 기온은 ${temp}도이고, \n 습도는 ${humidity}%입니다.`)
 }
 </script>
 
@@ -37,11 +35,11 @@ const showDetail = (cityName, status, temp, humidaty) => {
   <main class="weather-Mockup">
     <h1>과제 1: 날씨 (Mockup)</h1>
 
-    // 도시 검색 섹션
+    <!-- 도시 검색 섹션 -->
     <section class="search-box">
       <h2>도시 검색</h2>
 
-      // 양방향 바인딩 및 한글 처리 (:value, @input)
+      <!-- 양방향 바인딩 및 한글 처리 (:value, @input) -->
       <input
         type="text"
         placeholder="검색할 도시 이름 입력"
@@ -53,11 +51,11 @@ const showDetail = (cityName, status, temp, humidaty) => {
       </p>
     </section>
 
-    // 지역별 날씨 현황 섹션
+    <!-- 지역별 날씨 현황 섹션 -->
     <section class="weather-card">
       <h2>지역별 날씨 현황</h2>
 
-      // 배열 렌더링(v-for)
+      <!-- 배열 렌더링(v-for) -->
       <div
         v-for="weather in weatherList":key="weather.id"
         class="weather-card"
@@ -69,7 +67,7 @@ const showDetail = (cityName, status, temp, humidaty) => {
           <p>현재 기온:{{ weather.temp }}도</p>
           <p>습도:{{ weather.humidity }}%</p>
 
-          // 조건부 렌더링(v-if)
+          <!-- 조건부 렌더링(v-if) -->
           <span
             v-if="weather.temp >= 25"
             class="temperature-hot">
@@ -85,14 +83,15 @@ const showDetail = (cityName, status, temp, humidaty) => {
 
         <button
           type="button"
-          @click.stop="showDetail(weather)"
+          @click.stop="showDetail(weather.name, weather.status, weather.temp, weather.humidity)"
         >
           상세보기
         </button>
       </div>
     </section>
 
-    // 결과
+    <!-- 결과 -->
     <div class="status-bar">{{ Message }}</div>
   </main>
 </template>
+
