@@ -28,3 +28,22 @@ const showDetail = (cityName, status, temp, humidaty) => {
       '습도는 ${humidity}%입니다.')
 }
 </script>
+
+<template>
+  <main class="weather-Mockup">
+    <h1>과제 1: 날씨 (Mockup)</h1>
+
+    <section class="search-box">
+      <h2>도시 검색</h2>
+
+      <input
+        type="text"
+        placeholder="검색할 도시 이름 입력"
+        :value="searchCity"
+        @input="searchCity = $event.target.value"/>
+      <p>
+        검색 중인 도시:
+        <strong>{{ searchCity }}</strong>
+      </p>
+    </section>
+
