@@ -15,6 +15,10 @@ const searchCity = ref('')
 // 상태바
 const Message = ref('카드를 클릭하거나 검색해 보세요.')
 
+////////////////
+// 이벤트 및 수식어
+////////////////
+
 // 날씨 카드를 클릭했을 때
 const selectCity = (cityName) => {
   Message.value = '${cityName}이 선택되었습니다.'
@@ -33,9 +37,11 @@ const showDetail = (cityName, status, temp, humidaty) => {
   <main class="weather-Mockup">
     <h1>과제 1: 날씨 (Mockup)</h1>
 
+    // 도시 검색 섹션
     <section class="search-box">
       <h2>도시 검색</h2>
 
+      // 양방향 바인딩 및 한글 처리 (:value, @input)
       <input
         type="text"
         placeholder="검색할 도시 이름 입력"
@@ -43,7 +49,50 @@ const showDetail = (cityName, status, temp, humidaty) => {
         @input="searchCity = $event.target.value"/>
       <p>
         검색 중인 도시:
-        <strong>{{ searchCity }}</strong>
+        {{ searchCity }}
       </p>
     </section>
 
+    // 지역별 날씨 현황 섹션
+    <section class="weather-card">
+      <h2>지역별 날씨 현황</h2>
+
+      // 배열 렌더링(v-for)
+      <div
+        v-for="weather in weatherList":key="weather.id"
+        class="weather-card"
+        @click="selectCity(weather.name)">
+
+        <div>
+          <h3>{{ weather.name }} ({{ weather.status }})</h3>
+
+          <p>현재 기온:{{ weather.temp }}도</p>
+          <p>습도:{{ weather.humidity }}%</p>
+
+          // 조건부 렌더링(v-if)
+          <span
+            v-if="weather.temp >= 25"
+            class="temperature-hot">
+            🔥 더움 (25℃ 이상)
+        </span>
+
+          <span
+            v-else
+            class="temperature-cool">
+            ❄️ 선선함 (25℃ 미만)
+        </span>
+        </div>
+
+        <button
+          type="button"
+          @click.stop="showDetail(weather)"
+        >
+          상세보기
+        </button>
+      </div>
+    </section>
+
+    // 결과
+    <div class="status-bar">{{ Message }}</div>
+  </main>
+</template>
