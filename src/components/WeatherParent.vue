@@ -3,8 +3,8 @@ import { ref, computed, watch, watchEffect } from 'vue'
 
 // children import
 import BaseDashboardCard from './BaseDashboardCard.vue'
-import SearchBar from './SearchBar.vue'
 import WeatherCard from './WeatherCard.vue'
+import SearchBar from './SearchBar.vue'
 
 // WeatherParent : 지역별 날씨 현황 목록과 반응형 로직 포함
 
@@ -61,7 +61,7 @@ const showDetail = (weather) => {
 </script>
 
 <template>
-    <main class="weather-Mockup">
+    <main class="weather-Mockup">   
         <h1>과제 3: 날씨 (컴포넌트)</h1>
 
         <BaseDashboardCard>
@@ -78,7 +78,7 @@ const showDetail = (weather) => {
         <WeatherCard
             v-for="weather in filteredWeatherList"
             :key="weather.id"
-            class="weather-card"
+            :weather="weather"
             @click-card="selectCity(weather)"
             @click-detail="showDetail(weather)">
             </WeatherCard>
@@ -96,3 +96,14 @@ const showDetail = (weather) => {
         </div>
     </main>
 </template>
+
+<style scoped>
+    :global(body) {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+
+    background-color: #ffffff;
+    color: #333333;
+    }
+</style>

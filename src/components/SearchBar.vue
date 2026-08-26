@@ -10,11 +10,11 @@ const emit = defineEmits(['update:modelvalue'])
         <input
         type="text"
         placeholder="검색할 도시 이름 입력"
-        :value="modelvalue"
-        @input="emit('update:modelvalue', $event.target.value)"/>
+        :value="modelValue"
+        @input="emit('update:modelValue', $event.target.value)"/>
         <p>
         검색 중인 도시:
-        {{ modelvalue }}
+        {{ modelValue }}
         </p>
     </section>
 </template>
