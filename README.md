@@ -1,224 +1,347 @@
-# 과제 3: 날씨 (Component)
+# ☁️ 과제 4: Weather Router
 
-## 1. 프로젝트 개요
+## 1. 프로젝트 소개
 
-Vue Component 기능을 활용하여 기존 날씨 Mockup 화면을 기능별 Component로 분리하여 구현했습니다.
+Vue Router를 활용하여 기존 Weather Component 프로젝트를 여러 페이지 구조의 SPA(Single Page Application) 형태로 확장한 프로젝트입니다.
 
-기존에는 하나의 Vue 파일에서 데이터 관리, 검색, 날씨 카드 출력, 이벤트 처리를 모두 수행했지만, 이번 실습에서는 부모 Component와 자식 Component로 역할을 나누어 구조를 개선했습니다.
+기존 과제에서는 하나의 화면에서 날씨 데이터를 관리하고 Component를 분리하는 구조였다면, 이번 과제에서는 Router를 적용하여 URL에 따라 서로 다른 View를 출력하도록 구현했습니다.
 
-부모 Component에서는 전체 데이터와 반응형 상태를 관리하고, 자식 Component에서는 화면 구성과 사용자 이벤트 처리를 담당하도록 구현했습니다.
+주요 구현 내용:
+
+- Vue Router 설정
+- RouterLink를 이용한 페이지 이동
+- RouterView를 이용한 화면 출력
+- Dynamic Route를 활용한 상세 페이지 구현
+- Catch-all Route를 활용한 404 페이지 처리
+
 
 ---
 
-## 2. 프로젝트 구조
+# 2. 프로젝트 구조
 
 ```
 src
- ├ App.vue
- └ components
-      ├ WeatherParent.vue
-      ├ SearchBar.vue
-      ├ WeatherCard.vue
-      └ BaseDashboardCard.vue
+├── App.vue
+│
+├── router
+│   └── index.ts
+│
+├── components
+│   └── exercise
+│       ├── BaseDashboardCard.vue
+│       ├── SearchBar.vue
+│       └── WeatherCard.vue
+│
+└── views
+    ├── WeatherHomeView.vue
+    ├── WeatherDetailView.vue
+    ├── WeatherAboutView.vue
+    └── NotFoundView.vue
 ```
+
+
+## 구조 설명
+
+### components
+
+재사용 가능한 UI Component를 관리합니다.
+
+- SearchBar.vue
+  - 도시 검색 입력창 담당
+  - v-model을 이용한 양방향 데이터 전달
+
+- WeatherCard.vue
+  - 지역별 날씨 카드 출력
+  - 상세 페이지 이동 이벤트 처리
+
+- BaseDashboardCard.vue
+  - 공통 카드 디자인 제공
+
+
+### views
+
+URL 단위의 페이지 Component입니다.
+
+- WeatherHomeView.vue
+  - 메인 날씨 대시보드 화면
+
+- WeatherDetailView.vue
+  - 선택한 도시의 상세 날씨 정보 화면
+
+- WeatherAboutView.vue
+  - 서비스 소개 페이지
+
+- NotFoundView.vue
+  - 존재하지 않는 URL 접근 시 표시되는 404 페이지
+
+
 
 ---
 
-## 3. Component 구성 및 역할
+# 3. Vue Router 설정
 
-### WeatherParent.vue
+## Router 등록
 
-전체 날씨 데이터를 관리하는 부모 Component입니다.
+`main.ts`에서 Router를 Vue 애플리케이션에 등록합니다.
 
-날씨 목록, 검색어, 선택된 도시 정보를 상태 변수로 관리하며, 자식 Component들에게 필요한 데이터를 전달합니다.
-
-주요 기능:
-
-- 지역별 날씨 데이터 관리
-- 검색어 상태 관리
-- 선택된 도시 정보 관리
-- computed를 활용한 검색 결과 필터링
-- watch와 watchEffect를 활용한 상태 변화 감지
-- 자식 Component 이벤트 처리
-
-관리하는 주요 데이터:
-
-```javascript
-weatherList
-searchQuery
-selectedCityInfo
-filteredWeatherList
+```ts
+createApp(App)
+.use(router)
+.mount('#app')
 ```
+
+
+Router를 등록하면 URL 변경에 따라 Vue Component를 동적으로 변경할 수 있습니다.
+
 
 ---
 
-### SearchBar.vue
+# 4. 페이지 이동 구조
 
-도시 검색 기능을 담당하는 Component입니다.
+## App.vue
 
-부모 Component에서 전달받은 검색어를 기반으로 입력창을 구성하며, `v-model`을 활용한 양방향 데이터 바인딩을 구현했습니다.
+App.vue에서는 공통 Navigation과 RouterView 영역을 관리합니다.
 
-구현 내용:
 
-- props를 통한 `modelValue` 전달
-- emit을 통한 입력값 변경 이벤트 전달
-- 검색어 변경 시 부모 상태 업데이트
+```vue
+<RouterLink to="/">
+날씨 대시보드
+</RouterLink>
 
-데이터 흐름:
 
+<RouterLink to="/about">
+서비스 소개
+</RouterLink>
+
+
+<RouterView />
 ```
-사용자 입력
-    ↓
-SearchBar Component
-    ↓
-emit(update:modelValue)
-    ↓
-WeatherParent
-    ↓
-searchQuery 변경
-```
+
+
+역할:
+
+- RouterLink
+  - 사용자가 페이지 이동을 수행하는 영역
+
+- RouterView
+  - 현재 URL에 해당하는 View가 출력되는 위치
+
+
 
 ---
 
-### WeatherCard.vue
+# 5. WeatherHomeView
 
-지역별 날씨 정보를 출력하는 Component입니다.
+기존 Weather Component 구조를 페이지 단위 View로 변경했습니다.
 
-부모 Component에서 전달받은 날씨 데이터를 props로 받아 화면에 표시합니다.
 
-구현 내용:
-
-- props를 활용한 데이터 전달
-- emit을 활용한 카드 선택 이벤트 전달
-- 상세보기 버튼 이벤트 전달
-- 조건부 렌더링을 통한 날씨 상태 표시
-
-이벤트 흐름:
+구조:
 
 ```
-사용자 카드 클릭
-        ↓
-WeatherCard
-        ↓
-emit(click-card)
-        ↓
-WeatherParent
-        ↓
-selectedCityInfo 변경
-```
+WeatherHomeView
 
----
-
-### BaseDashboardCard.vue
-
-공통 카드 레이아웃을 관리하는 Component입니다.
-
-반복적으로 사용되는 카드 형태와 스타일을 하나의 Component로 분리하여 재사용성을 높였습니다.
-
-이를 통해 화면 구조를 단순화하고 동일한 디자인을 여러 영역에서 활용할 수 있도록 구성했습니다.
-
----
-
-## 4. Vue 주요 기능 활용
-
-### Component 분리
-
-화면을 기능 단위로 나누어 유지보수성과 재사용성을 높였습니다.
-
-```
-WeatherParent
  ├ SearchBar
+
  └ WeatherCard
 ```
 
-부모 Component는 데이터 관리 역할을 수행하고, 자식 Component는 화면 출력과 이벤트 전달 역할을 수행합니다.
+
+기존 과제에서 구현한 기능을 유지합니다.
+
+- 도시 검색
+- 날씨 목록 출력
+- 날씨 상태 표시
+- 상세보기 버튼 제공
+
+
 
 ---
 
-### Props
+# 6. Dynamic Route 구현
 
-부모 Component의 데이터를 자식 Component로 전달하기 위해 사용했습니다.
+날씨 상세 페이지는 Dynamic Route를 이용하여 구현했습니다.
 
-예시:
 
-```vue
-<WeatherCard
-  :weather="weather"
-/>
+Router 설정:
+
+```ts
+{
+ path:'/weather/:id',
+ component:WeatherDetailView
+}
 ```
 
-부모의 날씨 데이터를 자식 Component에서 받아 출력합니다.
+
+예:
+
+```
+/weather/city_01
+```
+
+
+URL의 id 값을 이용하여 선택한 도시 정보를 확인합니다.
+
+
+사용:
+
+```ts
+const route = useRoute()
+
+const cityId = route.params.id
+```
+
+
+동작 흐름:
+
+```
+날씨 카드 클릭
+
+↓
+
+router 이동
+
+↓
+
+/weather/city_01
+
+↓
+
+WeatherDetailView 출력
+```
+
+
 
 ---
 
-### Emit
+# 7. WeatherDetailView
 
-자식 Component에서 발생한 이벤트를 부모 Component로 전달하기 위해 사용했습니다.
+선택한 도시의 상세 정보를 표시합니다.
 
-예시:
 
-```javascript
-emit('click-card')
+출력 정보:
+
+- 도시명
+- 현재 기온
+- 습도
+- 날씨 상태
+
+
+예:
+
+```
+지역 상세 기상 정보
+
+지역 : 서울
+현재 기온 : 28℃
+습도 : 45%
+날씨 : 맑음
 ```
 
-카드 선택 이벤트를 부모에서 처리하도록 구현했습니다.
 
 ---
 
-### Computed
+# 8. WeatherAboutView
 
-검색어에 따라 출력할 날씨 목록을 자동으로 계산하기 위해 사용했습니다.
+서비스 소개 페이지입니다.
 
-```javascript
-const filteredWeatherList = computed(() => {
 
-  if (!searchQuery.value) {
-    return weatherList.value
-  }
+포함 내용:
 
-  return weatherList.value.filter(
-    weather => weather.name.includes(searchQuery.value)
-  )
-})
+- Vue Router 기반 프로젝트 설명
+- Component 구조 분리
+- Router Navigation
+- Dynamic Route 사용
+
+
+또한 사용자가 다시 메인 화면으로 이동할 수 있도록
+
+```
+대시보드 홈으로 이동
 ```
 
-검색어가 변경되면 관련된 데이터가 자동으로 갱신됩니다.
+버튼을 추가했습니다.
+
+
 
 ---
 
-### Watch / WatchEffect
+# 9. NotFoundView
 
-반응형 데이터의 변경을 감시하기 위해 사용했습니다.
+존재하지 않는 URL 접근을 처리합니다.
 
-Watch는 특정 데이터 변경을 감지합니다.
 
-```javascript
-watch(selectedCityInfo, (newCity)=>{
-  console.log(newCity)
-})
+Router 설정:
+
+```ts
+{
+ path:'/:pathMatch(.*)*',
+ component:NotFoundView
+}
 ```
 
-선택된 도시 정보가 변경될 때 실행됩니다.
 
+예:
 
-WatchEffect는 내부에서 사용하는 반응형 데이터를 자동 추적합니다.
-
-```javascript
-watchEffect(()=>{
-  console.log(searchQuery.value)
-})
+```
+localhost:5173/test
 ```
 
-검색어 변경을 감지하여 실행됩니다.
+
+결과:
+
+```
+페이지를 찾을 수 없습니다.
+```
+
 
 ---
 
-## 6. 학습 내용
+# 10. 구현 결과
 
-이번 실습을 통해 Vue Component 기반 개발 구조를 학습했습니다.
+구현된 페이지:
 
-하나의 화면을 여러 Component로 분리하고, 부모 Component에서는 데이터와 상태를 관리하며 자식 Component에서는 props와 emit을 활용하여 데이터를 전달하고 이벤트를 처리하는 구조를 구현했습니다.
+## 1) 날씨 대시보드
 
-또한 `computed`, `watch`, `watchEffect`를 활용하여 Vue의 반응형 시스템을 적용하고, 데이터 변경에 따라 화면이 자동으로 갱신되는 과정을 이해했습니다.
+- 도시 검색
+- 지역별 날씨 카드 출력
+- 상세보기 이동
 
-Component 분리를 통해 코드 재사용성과 유지보수성이 향상되는 Vue 개발 방식의 장점을 확인할 수 있었습니다.
+
+## 2) 상세 날씨 페이지
+
+- Dynamic Route 기반 도시 정보 출력
+
+
+## 3) 서비스 소개 페이지
+
+- 프로젝트 설명
+- 홈 이동 버튼 제공
+
+
+## 4) 404 페이지
+
+- 잘못된 URL 접근 처리
+
+
+
+---
+
+# 11. 과제4 핵심 학습 내용
+
+이번 과제를 통해 Vue Router를 활용한 SPA 구조를 구현했습니다.
+
+기존 Component 기반 화면에서:
+
+```
+Component
+    ↓
+View
+    ↓
+Router
+    ↓
+URL 기반 페이지 관리
+```
+
+형태로 확장하면서 실제 웹 서비스와 유사한 페이지 구조를 구성했습니다.
+
+특히 Dynamic Route를 활용하여 하나의 상세 페이지 Component에서 여러 도시 데이터를 처리할 수 있도록 구현했습니다.
