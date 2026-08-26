@@ -1,7 +1,6 @@
 <script setup lang="ts"></script>
 
 <template>
-  <h1>과제 4:라우터적용</h1>
   <nav>
     <RouterLink to="/">
       날씨 대시보드
