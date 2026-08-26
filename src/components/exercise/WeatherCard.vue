@@ -1,7 +1,13 @@
 <script setup lang="ts">
-defineProps({weather:Object})
+import {useRouter} from 'vue-router'
 
-const emit = defineEmits(['click-card', 'click-detail'])
+const router = useRouter()
+const props = defineProps({
+  weather:Object
+})
+
+const detail = ()=>{router.push(`/weather/${props.weather.id}`)}
+
 </script>
 
 <template>
@@ -33,7 +39,7 @@ const emit = defineEmits(['click-card', 'click-detail'])
         <div>
             <button
             type="button"
-            @click.stop="emit('click-detail', weather)"
+            @click.stop="detail"
             >
             상세보기
             </button>
