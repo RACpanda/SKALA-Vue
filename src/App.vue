@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch, watchEffect } from 'vue'
 
 // 날씨 데이터
 const weatherList = ref([
@@ -9,8 +9,27 @@ const weatherList = ref([
   {id: 'city_04',name: '인천', temp: 22, status: '맑음', humidity: 32,},
 ])
 
+const searchQuery = ref('')
+
+const selectedCityInfo = ref(null)
+
+const filteredWeatherList = computed(() => {
+  if (!searchQuery.value) {
+    return weatherList.value}
+
+  return weatherList.value.filter(
+    weather =>weather.name.includes(searchQuery.value))
+})
+
+watch(selectedCityInfo, (newCity)=>{
+  console.log('watch 실행:',newCity)})
+
 // 도시 검색
-const searchCity = ref('')
+const selectCity = (weather)=>{
+  selectedCityInfo.value = weather}
+  watchEffect(()=>{
+  console.log('현재 검색어:',searchQuery.value)})
+
 
 // 상태바
 const Message = ref('카드를 클릭하거나 검색해 보세요.')
@@ -20,7 +39,7 @@ const Message = ref('카드를 클릭하거나 검색해 보세요.')
 ////////////////
 
 // 날씨 카드를 클릭했을 때
-const selectCity = (cityName) => {
+const selectCitycard = (cityName) => {
   Message.value = `${cityName}이 선택되었습니다.`
 }
 
@@ -53,22 +72,26 @@ const showDetail = (cityName, status, temp, humidity) => {
       <input
         type="text"
         placeholder="검색할 도시 이름 입력"
-        :value="searchCity"
-        @input="searchCity = $event.target.value"/>
+        :value="searchQuery"
+        @input="searchQuery = $event.target.value"/>
       <p>
         검색 중인 도시:
-        {{ searchCity }}
+        {{ searchQuery }}
       </p>
     </section>
 
     <!-- 지역별 날씨 현황 섹션 -->
     <section class="weather-section">
       <h2>지역별 날씨 현황</h2>
-
       <!-- 배열 렌더링(v-for) -->
+      <p v-if="filteredWeatherList.length === 0">
+        검색 결과가 없습니다.
+      </p>
       <div
-        v-for="weather in weatherList":key="weather.id"
-        class="weather-card">
+        v-for="weather in filteredWeatherList"
+        :key="weather.id"
+        class="weather-card"
+        @click="selectCity(weather)">
 
         <div>
           <h3>{{ weather.name }} ({{ weather.status }})</h3>
@@ -100,7 +123,16 @@ const showDetail = (cityName, status, temp, humidity) => {
     </section>
 
     <!-- 결과 -->
-    <div class="status-bar">{{ Message }}</div>
+    <div class="status-bar">
+      <span v-if="selectedCityInfo">
+        {{selectedCityInfo.name}}
+        이 선택되었습니다.
+      </span>
+
+      <span v-else>
+        카드를 클릭하거나 검색해 보세요.
+      </span>
+    </div>
   </main>
 </template>
 
@@ -195,6 +227,11 @@ const showDetail = (cityName, status, temp, humidity) => {
 
   font-size: 18px;
   color: #444444;
+}
+
+.weather-section > p {
+  font-size: 14px;
+  color: grey;
 }
 
 
