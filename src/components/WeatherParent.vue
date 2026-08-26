@@ -66,7 +66,6 @@ const showDetail = (weather) => {
 
         <BaseDashboardCard>
         <SearchBar v-model = "searchQuery">
-            <h2>도시 검색(한글 즉시 동기화)</h2>
         </SearchBar>
         </BaseDashboardCard>
 
