@@ -62,8 +62,7 @@ const showDetail = (weather) => {
 
 <template>
     <main class="weather-Mockup">   
-        <h1>과제 4:라우터적용</h1>
-
+        
         <BaseDashboardCard>
         <SearchBar v-model = "searchQuery">
         </SearchBar>
