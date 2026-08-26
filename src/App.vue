@@ -4,7 +4,7 @@
   <h1>과제 4:라우터적용</h1>
   <nav>
     <RouterLink to="/">
-      날씨 리스트
+      날씨 대시보드
     </RouterLink>
 
     <RouterLink to="/about">

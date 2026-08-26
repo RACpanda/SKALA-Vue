@@ -78,7 +78,8 @@ const showDetail = (weather) => {
         <WeatherCard
             v-for="weather in filteredWeatherList"
             :key="weather.id"
-            :weather="weather">
+            :weather="weather"
+            @click-card="selectCity(weather)">
             </WeatherCard>
         </BaseDashboardCard>
 

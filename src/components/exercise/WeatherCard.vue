@@ -8,6 +8,7 @@ const props = defineProps({
 
 const detail = ()=>{router.push(`/weather/${props.weather.id}`)}
 
+const emit = defineEmits(['click-card'])
 </script>
 
 <template>
