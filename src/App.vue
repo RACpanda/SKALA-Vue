@@ -68,8 +68,7 @@ const showDetail = (cityName, status, temp, humidity) => {
       <!-- 배열 렌더링(v-for) -->
       <div
         v-for="weather in weatherList":key="weather.id"
-        class="weather-card"
-        @click="selectCity(weather.name)">
+        class="weather-card">
 
         <div>
           <h3>{{ weather.name }} ({{ weather.status }})</h3>
@@ -93,7 +92,7 @@ const showDetail = (cityName, status, temp, humidity) => {
 
         <button
           type="button"
-          @click="showDetail(weather.name, weather.status, weather.temp, weather.humidity)"
+          @click.stop="showDetail(weather.name, weather.status, weather.temp, weather.humidity)"
         >
           상세보기
         </button>
@@ -109,18 +108,13 @@ const showDetail = (cityName, status, temp, humidity) => {
 <style scoped>
 /* Vite 기본 다크 배경 제거 */
 :global(body) {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-
   background-color: #ffffff;
-  color: #333333;
 }
 
 
 /* 전체 화면 */
 .weather-Mockup {
-  width: 680px;
+  width: 700px;
   max-width: calc(100% - 40px);
 
   margin: 40px auto;
@@ -129,8 +123,6 @@ const showDetail = (cityName, status, temp, humidity) => {
   box-sizing: border-box;
 
   font-family: Arial, sans-serif;
-  color: #333333;
-  background-color: #ffffff;
 }
 
 
@@ -224,8 +216,6 @@ const showDetail = (cityName, status, temp, humidity) => {
 
   border: 1px solid #d8d8d8;
   border-radius: 6px;
-
-  cursor: pointer;
 }
 
 .weather-card:last-child {
