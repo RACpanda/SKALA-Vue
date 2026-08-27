@@ -86,7 +86,7 @@ const selectCity = (weather:Weather)=>{
         </BaseDashboardCard>
 
         <BaseDashboardCard>
-          <h2>지역별 날씨 현황</h2>
+          <h2>지역별 날씨 요약</h2>
           
           <p v-if="filteredWeatherList.length === 0">
               검색 결과가 없습니다.</p>

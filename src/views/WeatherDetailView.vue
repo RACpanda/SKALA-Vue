@@ -88,13 +88,14 @@ const displayTemp = computed(() => {
 </script>
 
 <template>
-    <h2>지역별 상세 기상 관측 정보</h2>
+    <h2>상세 기상 정보</h2>
 
-    <UnitToggler /> //현재 온도 단위 표시
+    
+     <UnitToggler /> <!-- 현재 온도 단위 표시 -->
 
     <v-card v-if="weather">
         <v-card-text>
-            <p>지정 지역:{{weather.name}}</p>
+            <p>지역:{{weather.name}}</p>
             <p>실시간 기온:{{displayTemp }}{{ configStore.unitSymbol }}</p>
             <p>대기 습도:{{weather.humidity}}%</p>
             <p>기상 현황:{{weather.status}}</p>

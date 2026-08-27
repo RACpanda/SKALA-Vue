@@ -29,7 +29,7 @@ const emit = defineEmits(['click-card']) // 카드 선택 이벤트 전달
                 ({{ weather.status }})
             </h3>
             <span
-                v-if="weather.temp >= 25"
+                v-if="weather.temp >= 30"
                 class="temperature-hot">
                 🔥 더움
             </span>

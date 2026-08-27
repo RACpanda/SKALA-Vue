@@ -3,7 +3,7 @@
 
 <template>
   <div class="app-container">
-    <h1>과제 4:라우터적용</h1>
+    <h1>한국 주요도시 날씨 및 뉴스 탐색</h1>
 
     <nav>
       <RouterLink to="/">

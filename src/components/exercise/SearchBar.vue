@@ -6,7 +6,7 @@ const emit = defineEmits(['update:modelValue'])
 
 <template>
     <section class="search-box">
-        <h2>도시 검색(한글 즉시 동기화)</h2>
+        <h2>도시 검색</h2>
         <input
         type="text"
         placeholder="검색할 도시 이름 입력"
