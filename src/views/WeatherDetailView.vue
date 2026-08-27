@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useRoute} from 'vue-router'
 import { computed } from 'vue'
-import { useConfigStore } from '@/stores/configStore.js'
+import { useConfigStore } from '@/stores/configStore'
 
 const route = useRoute()
 const cityId = route.params.id
@@ -18,7 +18,7 @@ const weather = weatherData[cityId]
 const configStore = useConfigStore()
 
 const displayTemp = computed(() => {
-  const rawTemp = props.cityItem.temp // 기본 원본 데이터는 섭씨 숫자
+  const rawTemp = weather.temp // 기본 원본 데이터는 섭씨 숫자
 
   if (configStore.unit === 'fahrenheit') {
     return Math.round((rawTemp * 9) / 5 + 32) // 화씨 변환 연산
@@ -31,7 +31,7 @@ const displayTemp = computed(() => {
     <h2>지역별 상세 기상 관측 정보</h2>
     <div>
         <p>지정 지역:{{weather.name}}</p>
-        <p>실시간 기온:{{ displayTemp }}{{ configStore.unitSymbol }}도</p>
+        <p>실시간 기온:{{ displayTemp }}{{ configStore.unitSymbol }}</p>
         <p>대기 습도:{{weather.humidity}}%</p>
         <p>기상 현황:{{weather.status}}</p>
     </div>

@@ -14,4 +14,9 @@ export const useConfigStore = defineStore('config',() => {
         else {
             unit.value = 'celsius'
         }}
+        return {
+            unit,
+            unitSymbol,
+            toggleUnit
+        }
 })
