@@ -28,13 +28,20 @@ const fetchWeather = async () => {
 
     for(const city of cityList) {
       const data = await getWeather(city.lat, city.lon)
-      
+
+      const convertWeatherStatus = (status) => {
+        if(status.includes('비')) return '비'
+        if(status.includes('구름') || status.includes('흐림')) return '구름'
+        if(status.includes('맑')) return '맑음'
+        return status
+      }
+
       result.push({
         id: city.id,
         name: city.name,
         temp: data.main.temp,
         humidity: data.main.humidity,
-        status: data.weather[0].description
+        status: convertWeatherStatus(data.weather[0].description)
       })
     }
     weatherList.value = result
