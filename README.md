@@ -16,7 +16,7 @@ Vue Router를 적용한 기존 Weather Router 프로젝트에 Pinia를 활용한
 - State 기반 전역 상태 관리
 - Getter를 활용한 계산 데이터 관리
 - Action을 활용한 상태 변경
-- UnitToggle Component 구현
+- UnitToggler Component 구현
 - 날씨 상세 페이지 온도 단위 변환 적용
 - OpenWeather API 연동
 - News API 연동
@@ -31,21 +31,21 @@ Vue Router를 적용한 기존 Weather Router 프로젝트에 Pinia를 활용한
 src
 
 ├── App.vue
-│
+
 ├── api
-│   ├── weatherApi.js
-│   └── newsApi.js
-│
+│   ├── weatherApi.ts
+│   └── newsApi.ts
+
 ├── stores
 │   └── configStore.ts
-│
+
 ├── components
 │   └── exercise
 │       ├── BaseDashboardCard.vue
 │       ├── SearchBar.vue
 │       ├── WeatherCard.vue
-│       └── UnitToggle.vue
-│
+│       └── UnitToggler.vue
+
 └── views
     ├── WeatherHomeView.vue
     ├── WeatherDetailView.vue
@@ -98,7 +98,6 @@ export const useConfigStore = defineStore('config', () => {
     const unit = ref('celsius')
 
     const unitSymbol = computed(() => {
-
         if(unit.value === 'fahrenheit'){
             return '°F'
         }
@@ -106,18 +105,16 @@ export const useConfigStore = defineStore('config', () => {
         return '°C'
     })
 
-
     function toggleUnit(){
 
         if(unit.value === 'celsius'){
             unit.value = 'fahrenheit'
         }
-
         else{
             unit.value = 'celsius'
         }
-    }
 
+    }
 
     return {
         unit,
@@ -159,6 +156,7 @@ const unitSymbol = computed(() => {
     }
 
     return '°C'
+
 })
 ```
 
@@ -181,10 +179,10 @@ function toggleUnit(){
     if(unit.value === 'celsius'){
         unit.value = 'fahrenheit'
     }
-
     else{
         unit.value = 'celsius'
     }
+
 }
 ```
 
@@ -202,7 +200,6 @@ function toggleUnit(){
 °C
 ```
 
-
 ---
 
 # 6. External API 적용
@@ -214,7 +211,7 @@ function toggleUnit(){
 파일 위치:
 
 ```
-src/api/weatherApi.js
+src/api/weatherApi.ts
 ```
 
 데이터 흐름:
@@ -224,7 +221,7 @@ WeatherDetailView
 
 ↓
 
-weatherApi.js
+weatherApi.ts
 
 ↓
 
@@ -244,7 +241,7 @@ OpenWeather API
 
 API 호출 구조:
 
-```js
+```ts
 axios.get(BASE_URL,{
     params:{
         lat,
@@ -256,7 +253,6 @@ axios.get(BASE_URL,{
 })
 ```
 
-
 ---
 
 ## News API
@@ -266,7 +262,7 @@ axios.get(BASE_URL,{
 파일 위치:
 
 ```
-src/api/newsApi.js
+src/api/newsApi.ts
 ```
 
 데이터 흐름:
@@ -276,7 +272,7 @@ WeatherDetailView
 
 ↓
 
-newsApi.js
+newsApi.ts
 
 ↓
 
@@ -310,15 +306,14 @@ News API
 
 검색 결과가 부족한 지역은 더 넓은 범위로 검색하도록 구성했습니다.
 
-
 ---
 
-# 7. UnitToggle Component 구현
+# 7. UnitToggler Component 구현
 
 파일 위치:
 
 ```
-src/components/exercise/UnitToggle.vue
+src/components/exercise/UnitToggler.vue
 ```
 
 역할:
@@ -331,7 +326,7 @@ src/components/exercise/UnitToggle.vue
 데이터 흐름:
 
 ```
-UnitToggle.vue
+UnitToggler.vue
 
 ↓
 
@@ -341,7 +336,6 @@ configStore.toggleUnit()
 
 전체 Component 상태 변경
 ```
-
 
 ---
 
@@ -366,16 +360,16 @@ Computed를 활용하여 표시 값을 관리합니다.
 ```ts
 const displayTemp = computed(() => {
 
-    const rawTemp = weather.temp
+    const rawTemp = weather.value.temp
 
     if(configStore.unit === 'fahrenheit'){
-
         return Math.round(
             (rawTemp * 9) / 5 + 32
         )
     }
 
     return rawTemp
+
 })
 ```
 
@@ -394,7 +388,6 @@ const displayTemp = computed(() => {
 82°F
 ```
 
-
 ---
 
 # 9. External UI Library 적용
@@ -409,13 +402,11 @@ const displayTemp = computed(() => {
 npm install vuetify
 ```
 
-
 등록:
 
 ```ts
 app.use(vuetify)
 ```
-
 
 적용 목적:
 
@@ -424,23 +415,22 @@ app.use(vuetify)
 
 주요 Component:
 
-|기존 UI|Vuetify Component|
+| 기존 UI | Vuetify Component |
 |---|---|
-|button|v-btn|
-|카드 영역|v-card|
-|입력 영역|v-text-field|
+| button | v-btn |
+| 카드 영역 | v-card |
+| 입력 영역 | v-text-field |
 
 
 적용 범위:
 
 - WeatherCard UI
 - SearchBar 입력 영역
-- UnitToggle 버튼
+- UnitToggler 버튼
 - 상세 정보 카드
 
 
 기존 데이터 처리 로직은 유지하고 화면 출력 Component만 개선했습니다.
-
 
 ---
 
@@ -474,12 +464,11 @@ Props / Emit
 
        WeatherDetailView
 
-       UnitToggle
+       UnitToggler
 ```
 
 
 Pinia Store를 통해 여러 Component가 동일한 상태를 공유합니다.
-
 
 ---
 
@@ -487,7 +476,7 @@ Pinia Store를 통해 여러 Component가 동일한 상태를 공유합니다.
 
 ## 온도 단위 변경
 
-- UnitToggle 버튼 제공
+- UnitToggler 버튼 제공
 - 섭씨/화씨 전환
 
 
@@ -516,11 +505,13 @@ Pinia Store를 통해 여러 Component가 동일한 상태를 공유합니다.
 - 기존 기능 유지
 - UI 구조 개선
 
+
 ## UnitToggler Component 위치 변경
 
 기존에는 `App.vue`의 Navigation 영역에 `UnitToggler` Component를 배치하여 모든 페이지에서 온도 단위 변경 버튼이 표시되었습니다.
 
 변경 후에는 상세 날씨 정보 화면에서만 온도 단위 변경 기능을 사용할 수 있도록 위치를 변경했습니다.
+
 
 변경 전:
 
@@ -536,6 +527,7 @@ UnitToggler
 전체 페이지 표시
 ```
 
+
 변경 후:
 
 ```
@@ -550,18 +542,75 @@ UnitToggler
 상세 페이지 표시
 ```
 
+
 수정 내용:
 
 - `App.vue`에서 `UnitToggler` Component 제거
 - `WeatherDetailView.vue`에 `UnitToggler` Component 추가
-- 기존 Pinia Store 상태 관리 구조는 유지
-- 버튼 동작 방식과 온도 변환 기능은 기존과 동일하게 유지
+- 기존 Pinia Store 상태 관리 구조 유지
+- 버튼 동작 방식과 온도 변환 기능 유지
+
 
 이를 통해 메인 화면에서는 날씨 정보 확인에 집중하고, 실제 온도 변환이 필요한 상세 페이지에서만 단위 변경 기능을 사용할 수 있도록 화면 구성을 개선했습니다.
 
 ---
 
-# 12. 핵심 학습 내용
+# 12. Source Code 품질관리 및 Build & Deployment
+
+## Source Code 품질관리
+
+코드 품질 관리를 위해 ESLint와 Oxlint를 활용하여 Source Code를 점검했습니다.
+
+적용 내용:
+
+- ESLint를 통한 코드 규칙 검사
+- Oxlint를 활용한 정적 분석
+- TypeScript Type Check를 통한 오류 검증
+- API Key 환경 변수 관리
+
+
+검사 명령어:
+
+```bash
+npm run lint
+```
+
+
+검사 결과:
+
+- Oxlint 검사 완료
+- ESLint 검사 완료
+
+
+---
+
+## Build & Deployment
+
+배포 전 Production Build를 수행하여 실행 가능한 결과물을 생성했습니다.
+
+Build 명령어:
+
+```bash
+npm run build
+```
+
+
+Build 결과:
+
+```
+dist/
+
+├── index.html
+
+└── assets/
+```
+
+
+생성된 Build 결과물을 기반으로 Hosting 환경에서 배포 가능한 형태로 구성했습니다.
+
+---
+
+# 13. 핵심 학습 내용
 
 이번 과제를 통해 Vue Application에서 전역 상태 관리, 외부 API 연동, UI Library 적용 방법을 학습했습니다.
 
@@ -599,4 +648,3 @@ Pinia Store
 또한 외부 API를 활용하여 실시간 데이터를 제공하는 방법과 UI Library를 활용한 Component 기반 화면 구성 방법을 학습했습니다.
 
 이를 통해 Vue Application의 확장성과 유지보수성을 높이는 구조를 구현했습니다.
-```
