@@ -1,224 +1,530 @@
-# 과제 3: 날씨 (Component)
+# ☁️ Hands on - Weather analysis with Vue
 
-## 1. 프로젝트 개요
+## 1. 프로젝트 소개
 
-Vue Component 기능을 활용하여 기존 날씨 Mockup 화면을 기능별 Component로 분리하여 구현했습니다.
+Vue Router를 적용한 기존 Weather Router 프로젝트에 Pinia를 활용한 전역 상태 관리 기능과 외부 API 연동 기능을 추가한 프로젝트입니다.
 
-기존에는 하나의 Vue 파일에서 데이터 관리, 검색, 날씨 카드 출력, 이벤트 처리를 모두 수행했지만, 이번 실습에서는 부모 Component와 자식 Component로 역할을 나누어 구조를 개선했습니다.
+Pinia Store를 적용하여 온도 단위 설정을 전역 상태로 관리하고, OpenWeather API와 News API를 활용하여 실시간 날씨 데이터와 관련 뉴스 데이터를 제공하도록 확장했습니다.
 
-부모 Component에서는 전체 데이터와 반응형 상태를 관리하고, 자식 Component에서는 화면 구성과 사용자 이벤트 처리를 담당하도록 구현했습니다.
+또한 Vuetify UI Library를 적용하여 기존 HTML 기반 UI를 Component 기반 구조로 개선했습니다.
+
+주요 구현 내용:
+
+- Pinia Store 생성
+- State 기반 전역 상태 관리
+- Getter를 활용한 계산 데이터 관리
+- Action을 활용한 상태 변경
+- UnitToggler Component 구현
+- 날씨 상세 페이지 온도 단위 변환 적용
+- OpenWeather API 연동
+- News API 연동
+- Vuetify UI Library 적용
+
 
 ---
 
-## 2. 프로젝트 구조
+# 2. 프로젝트 구조
 
 ```
 src
- ├ App.vue
- └ components
-      ├ WeatherParent.vue
-      ├ SearchBar.vue
-      ├ WeatherCard.vue
-      └ BaseDashboardCard.vue
+
+├── App.vue
+
+├── api
+│   ├── weatherApi.ts
+│   └── newsApi.ts
+
+├── stores
+│   └── configStore.ts
+
+├── components
+│   └── exercise
+│       ├── BaseDashboardCard.vue
+│       ├── SearchBar.vue
+│       ├── WeatherCard.vue
+│       └── UnitToggler.vue
+
+└── views
+    ├── WeatherHomeView.vue
+    ├── WeatherDetailView.vue
+    ├── WeatherAboutView.vue
+    └── NotFoundView.vue
 ```
 
 ---
 
-## 3. Component 구성 및 역할
+# 3. Pinia 설정
 
-### WeatherParent.vue
+## Pinia 등록
 
-전체 날씨 데이터를 관리하는 부모 Component입니다.
+`main.ts`에서 Pinia를 Vue Application에 등록합니다.
 
-날씨 목록, 검색어, 선택된 도시 정보를 상태 변수로 관리하며, 자식 Component들에게 필요한 데이터를 전달합니다.
+```ts
+app.use(createPinia())
+```
 
-주요 기능:
+Pinia 등록 이후 여러 Component에서 하나의 Store를 공유할 수 있습니다.
 
-- 지역별 날씨 데이터 관리
-- 검색어 상태 관리
-- 선택된 도시 정보 관리
-- computed를 활용한 검색 결과 필터링
-- watch와 watchEffect를 활용한 상태 변화 감지
-- 자식 Component 이벤트 처리
 
-관리하는 주요 데이터:
+---
 
-```javascript
-weatherList
-searchQuery
-selectedCityInfo
-filteredWeatherList
+# 4. Config Store 구현
+
+파일 위치:
+
+```
+src/stores/configStore.ts
+```
+
+Config Store는 온도 단위 설정을 전역으로 관리합니다.
+
+주요 역할:
+
+- 현재 온도 단위 저장
+- 화면 표시용 단위 반환
+- 온도 단위 변경
+
+
+## State
+
+현재 선택된 온도 단위를 저장합니다.
+
+```ts
+const unit = ref('celsius')
+```
+
+저장 값:
+
+```
+celsius
+fahrenheit
+```
+
+
+## Getter
+
+현재 상태를 기반으로 화면 표시용 단위를 반환합니다.
+
+```ts
+const unitSymbol = computed(() => {
+
+    if(unit.value === 'fahrenheit'){
+        return '°F'
+    }
+
+    return '°C'
+
+})
+```
+
+결과:
+
+```
+celsius → °C
+
+fahrenheit → °F
+```
+
+
+## Action
+
+사용자의 버튼 입력에 따라 상태를 변경합니다.
+
+```ts
+function toggleUnit(){
+
+    if(unit.value === 'celsius'){
+        unit.value = 'fahrenheit'
+    }
+    else{
+        unit.value = 'celsius'
+    }
+
+}
+```
+
+동작:
+
+```
+°C
+
+↓
+
+°F
+
+↓
+
+°C
 ```
 
 ---
 
-### SearchBar.vue
+# 5. External API 적용
 
-도시 검색 기능을 담당하는 Component입니다.
+## OpenWeather API
 
-부모 Component에서 전달받은 검색어를 기반으로 입력창을 구성하며, `v-model`을 활용한 양방향 데이터 바인딩을 구현했습니다.
+실시간 날씨 데이터를 제공하기 위해 OpenWeather API를 사용했습니다.
 
-구현 내용:
+파일 위치:
 
-- props를 통한 `modelValue` 전달
-- emit을 통한 입력값 변경 이벤트 전달
-- 검색어 변경 시 부모 상태 업데이트
+```
+src/api/weatherApi.ts
+```
 
 데이터 흐름:
 
 ```
-사용자 입력
-    ↓
-SearchBar Component
-    ↓
-emit(update:modelValue)
-    ↓
-WeatherParent
-    ↓
-searchQuery 변경
+WeatherDetailView
+
+↓
+
+weatherApi.ts
+
+↓
+
+OpenWeather API
+
+↓
+
+날씨 데이터 반환
 ```
 
----
+제공 데이터:
 
-### WeatherCard.vue
+- 현재 기온
+- 습도
+- 날씨 상태
 
-지역별 날씨 정보를 출력하는 Component입니다.
 
-부모 Component에서 전달받은 날씨 데이터를 props로 받아 화면에 표시합니다.
+API 호출 구조:
 
-구현 내용:
-
-- props를 활용한 데이터 전달
-- emit을 활용한 카드 선택 이벤트 전달
-- 상세보기 버튼 이벤트 전달
-- 조건부 렌더링을 통한 날씨 상태 표시
-
-이벤트 흐름:
-
-```
-사용자 카드 클릭
-        ↓
-WeatherCard
-        ↓
-emit(click-card)
-        ↓
-WeatherParent
-        ↓
-selectedCityInfo 변경
-```
-
----
-
-### BaseDashboardCard.vue
-
-공통 카드 레이아웃을 관리하는 Component입니다.
-
-반복적으로 사용되는 카드 형태와 스타일을 하나의 Component로 분리하여 재사용성을 높였습니다.
-
-이를 통해 화면 구조를 단순화하고 동일한 디자인을 여러 영역에서 활용할 수 있도록 구성했습니다.
-
----
-
-## 4. Vue 주요 기능 활용
-
-### Component 분리
-
-화면을 기능 단위로 나누어 유지보수성과 재사용성을 높였습니다.
-
-```
-WeatherParent
- ├ SearchBar
- └ WeatherCard
-```
-
-부모 Component는 데이터 관리 역할을 수행하고, 자식 Component는 화면 출력과 이벤트 전달 역할을 수행합니다.
-
----
-
-### Props
-
-부모 Component의 데이터를 자식 Component로 전달하기 위해 사용했습니다.
-
-예시:
-
-```vue
-<WeatherCard
-  :weather="weather"
-/>
-```
-
-부모의 날씨 데이터를 자식 Component에서 받아 출력합니다.
-
----
-
-### Emit
-
-자식 Component에서 발생한 이벤트를 부모 Component로 전달하기 위해 사용했습니다.
-
-예시:
-
-```javascript
-emit('click-card')
-```
-
-카드 선택 이벤트를 부모에서 처리하도록 구현했습니다.
-
----
-
-### Computed
-
-검색어에 따라 출력할 날씨 목록을 자동으로 계산하기 위해 사용했습니다.
-
-```javascript
-const filteredWeatherList = computed(() => {
-
-  if (!searchQuery.value) {
-    return weatherList.value
-  }
-
-  return weatherList.value.filter(
-    weather => weather.name.includes(searchQuery.value)
-  )
+```ts
+axios.get(BASE_URL,{
+    params:{
+        lat,
+        lon,
+        appid:API_KEY,
+        units:'metric',
+        lang:'kr'
+    }
 })
 ```
 
-검색어가 변경되면 관련된 데이터가 자동으로 갱신됩니다.
+---
+
+## News API
+
+날씨 관련 뉴스 데이터를 제공하기 위해 News API를 추가했습니다.
+
+파일 위치:
+
+```
+src/api/newsApi.ts
+```
+
+데이터 흐름:
+
+```
+WeatherDetailView
+
+↓
+
+newsApi.ts
+
+↓
+
+News API
+
+↓
+
+뉴스 목록 반환
+```
+
+제공 데이터:
+
+- 뉴스 제목
+- 뉴스 설명
+- 기사 링크
+
+
+검색 방식:
+
+```
+도시명 + 날씨
+
+↓
+
+지역명 + 날씨
+
+↓
+
+날씨
+```
+
+검색 결과가 부족한 지역은 더 넓은 범위로 검색하도록 구성했습니다.
 
 ---
 
-### Watch / WatchEffect
+# 6. UnitToggler Component 구현
 
-반응형 데이터의 변경을 감시하기 위해 사용했습니다.
+파일 위치:
 
-Watch는 특정 데이터 변경을 감지합니다.
-
-```javascript
-watch(selectedCityInfo, (newCity)=>{
-  console.log(newCity)
-})
+```
+src/components/exercise/UnitToggler.vue
 ```
 
-선택된 도시 정보가 변경될 때 실행됩니다.
+역할:
+
+- 현재 온도 단위 표시
+- 버튼 클릭 이벤트 처리
+- Pinia Action 실행
 
 
-WatchEffect는 내부에서 사용하는 반응형 데이터를 자동 추적합니다.
+데이터 흐름:
 
-```javascript
-watchEffect(()=>{
-  console.log(searchQuery.value)
-})
 ```
+UnitToggler.vue
 
-검색어 변경을 감지하여 실행됩니다.
+↓
+
+configStore.toggleUnit()
+
+↓
+
+전체 Component 상태 변경
+```
 
 ---
 
-## 6. 학습 내용
+# 7. WeatherDetailView 적용
 
-이번 실습을 통해 Vue Component 기반 개발 구조를 학습했습니다.
+상세 페이지에서는 Store의 현재 단위 설정에 따라 온도를 변환합니다.
 
-하나의 화면을 여러 Component로 분리하고, 부모 Component에서는 데이터와 상태를 관리하며 자식 Component에서는 props와 emit을 활용하여 데이터를 전달하고 이벤트를 처리하는 구조를 구현했습니다.
+기존:
 
-또한 `computed`, `watch`, `watchEffect`를 활용하여 Vue의 반응형 시스템을 적용하고, 데이터 변경에 따라 화면이 자동으로 갱신되는 과정을 이해했습니다.
+```ts
+weather.temp
+```
 
-Component 분리를 통해 코드 재사용성과 유지보수성이 향상되는 Vue 개발 방식의 장점을 확인할 수 있었습니다.
+변경:
+
+```ts
+displayTemp
+```
+
+Computed를 활용하여 표시 값을 관리합니다.
+
+```ts
+const displayTemp = computed(() => {
+
+    const rawTemp = weather.value.temp
+
+    if(configStore.unit === 'fahrenheit'){
+        return Math.round(
+            (rawTemp * 9) / 5 + 32
+        )
+    }
+
+    return rawTemp
+
+})
+```
+
+변환 예시:
+
+```
+섭씨
+
+28°C
+
+
+↓
+
+화씨
+
+82°F
+```
+
+---
+
+# 8. External UI Library 적용
+
+## Vuetify 적용
+
+화면 Component 구조 개선을 위해 Vuetify UI Library를 적용했습니다.
+
+설치:
+
+```bash
+npm install vuetify
+```
+
+등록:
+
+```ts
+app.use(vuetify)
+```
+
+적용 목적:
+
+기존 HTML 태그 기반 UI를 재사용 가능한 Component 기반 UI 구조로 개선합니다.
+
+
+주요 Component:
+
+| 기존 UI | Vuetify Component |
+|---|---|
+| button | v-btn |
+| 카드 영역 | v-card |
+| 입력 영역 | v-text-field |
+
+
+적용 범위:
+
+- WeatherCard UI
+- SearchBar 입력 영역
+- UnitToggler 버튼
+- 상세 정보 카드
+
+
+기존 데이터 처리 로직은 유지하고 화면 출력 Component만 개선했습니다.
+
+---
+
+# 9. 구현 결과
+
+## 온도 단위 변경
+
+- UnitToggler 버튼 제공
+- 섭씨/화씨 전환
+
+
+## 날씨 대시보드
+
+- OpenWeather API 기반 실시간 날씨 출력
+- 지역별 날씨 정보 표시
+
+
+## 상세 페이지
+
+- Dynamic Route 기반 상세 정보 출력
+- Store 기반 온도 변환 적용
+
+
+## 뉴스 기능
+
+- News API 연동
+- 날씨 관련 뉴스 출력
+- 기사 링크 제공
+
+
+## UI 개선
+
+- Vuetify Component 적용
+- 기존 기능 유지
+- UI 구조 개선
+
+---
+
+# 10. Source Code 품질관리 및 Build & Deployment
+
+## Source Code 품질관리
+
+코드 품질 관리를 위해 ESLint와 Oxlint를 활용하여 Source Code를 점검했습니다.
+
+적용 내용:
+
+- ESLint를 통한 코드 규칙 검사
+- Oxlint를 활용한 정적 분석
+- TypeScript Type Check를 통한 오류 검증
+- API Key 환경 변수 관리
+
+
+검사 명령어:
+
+```bash
+npm run lint
+```
+
+
+검사 결과:
+
+- Oxlint 검사 완료
+- ESLint 검사 완료
+
+
+---
+
+## Build & Deployment
+
+배포 전 Production Build를 수행하여 실행 가능한 결과물을 생성했습니다.
+
+Build 명령어:
+
+```bash
+npm run build
+```
+
+
+Build 결과:
+
+```
+dist/
+
+├── index.html
+
+└── assets/
+```
+
+
+생성된 Build 결과물을 기반으로 Hosting 환경에서 배포 가능한 형태로 구성했습니다.
+
+---
+---
+
+# 추가 사항. UnitToggler Component 위치 변경
+
+기존에는 `App.vue`의 Navigation 영역에 `UnitToggler` Component를 배치하여 모든 페이지에서 온도 단위 변경 버튼이 표시되었습니다.
+
+변경 후에는 상세 날씨 정보 화면에서만 온도 단위 변경 기능을 사용할 수 있도록 위치를 변경했습니다.
+
+
+변경 전:
+
+```
+App.vue
+
+↓
+
+UnitToggler
+
+↓
+
+전체 페이지 표시
+```
+
+
+변경 후:
+
+```
+WeatherDetailView.vue
+
+↓
+
+UnitToggler
+
+↓
+
+상세 페이지 표시
+```
+
+
+수정 내용:
+
+- `App.vue`에서 `UnitToggler` Component 제거
+- `WeatherDetailView.vue`에 `UnitToggler` Component 추가
+- 기존 Pinia Store 상태 관리 구조 유지
+- 버튼 동작 방식과 온도 변환 기능 유지
+
+
+이를 통해 메인 화면에서는 날씨 정보 확인에 집중하고, 실제 온도 변환이 필요한 상세 페이지에서만 단위 변경 기능을 사용할 수 있도록 화면 구성을 개선했습니다.
