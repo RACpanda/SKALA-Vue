@@ -1,0 +1,23 @@
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useConfigStore = defineStore('config',() => {
+    const unit = ref('celsius') // 현재 온도 단위 저장
+    const unitSymbol = computed(() => {
+        if (unit.value === 'fahrenheit') {
+            return '°F'}
+        return '°C'})
+
+    function toggleUnit() {
+        if (unit.value === 'celsius') {
+            unit.value = 'fahrenheit'
+        }
+        else {
+            unit.value = 'celsius'
+        }}
+        return {
+            unit,
+            unitSymbol,
+            toggleUnit
+        }
+})
