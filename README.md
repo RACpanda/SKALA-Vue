@@ -1,12 +1,10 @@
-# ☁️ 과제 5: Weather Store (Pinia)
+# ☁️ Hands on - Weather analysis with Vue
 
 ## 1. 프로젝트 소개
 
 Vue Router를 적용한 기존 Weather Router 프로젝트에 Pinia를 활용한 전역 상태 관리 기능과 외부 API 연동 기능을 추가한 프로젝트입니다.
 
-기존 과제에서는 Component와 View 내부에서 상태 데이터를 개별적으로 관리했습니다. 하지만 여러 화면에서 동일한 데이터를 공유해야 하는 경우 Props 전달과 Event 전달 과정이 복잡해질 수 있습니다.
-
-이번 과제에서는 Pinia Store를 적용하여 온도 단위 설정을 전역 상태로 관리하고, OpenWeather API와 News API를 활용하여 실시간 날씨 데이터와 관련 뉴스 데이터를 제공하도록 확장했습니다.
+Pinia Store를 적용하여 온도 단위 설정을 전역 상태로 관리하고, OpenWeather API와 News API를 활용하여 실시간 날씨 데이터와 관련 뉴스 데이터를 제공하도록 확장했습니다.
 
 또한 Vuetify UI Library를 적용하여 기존 HTML 기반 UI를 Component 기반 구조로 개선했습니다.
 
@@ -87,47 +85,6 @@ Config Store는 온도 단위 설정을 전역으로 관리합니다.
 - 온도 단위 변경
 
 
-구현:
-
-```ts
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-
-export const useConfigStore = defineStore('config', () => {
-
-    const unit = ref('celsius')
-
-    const unitSymbol = computed(() => {
-        if(unit.value === 'fahrenheit'){
-            return '°F'
-        }
-
-        return '°C'
-    })
-
-    function toggleUnit(){
-
-        if(unit.value === 'celsius'){
-            unit.value = 'fahrenheit'
-        }
-        else{
-            unit.value = 'celsius'
-        }
-
-    }
-
-    return {
-        unit,
-        unitSymbol,
-        toggleUnit
-    }
-})
-```
-
----
-
-# 5. Store 구성 요소
-
 ## State
 
 현재 선택된 온도 단위를 저장합니다.
@@ -202,7 +159,7 @@ function toggleUnit(){
 
 ---
 
-# 6. External API 적용
+# 5. External API 적용
 
 ## OpenWeather API
 
@@ -308,7 +265,7 @@ News API
 
 ---
 
-# 7. UnitToggler Component 구현
+# 6. UnitToggler Component 구현
 
 파일 위치:
 
@@ -339,7 +296,7 @@ configStore.toggleUnit()
 
 ---
 
-# 8. WeatherDetailView 적용
+# 7. WeatherDetailView 적용
 
 상세 페이지에서는 Store의 현재 단위 설정에 따라 온도를 변환합니다.
 
@@ -390,7 +347,7 @@ const displayTemp = computed(() => {
 
 ---
 
-# 9. External UI Library 적용
+# 8. External UI Library 적용
 
 ## Vuetify 적용
 
@@ -434,45 +391,7 @@ app.use(vuetify)
 
 ---
 
-# 10. 데이터 흐름
-
-## 적용 전
-
-```
-Component
-
-↓
-
-Props / Emit
-
-↓
-
-데이터 전달
-```
-
-
-## 적용 후
-
-```
-             configStore
-
-                  |
-
-       ---------------------
-
-       WeatherHomeView
-
-       WeatherDetailView
-
-       UnitToggler
-```
-
-
-Pinia Store를 통해 여러 Component가 동일한 상태를 공유합니다.
-
----
-
-# 11. 구현 결과
+# 9. 구현 결과
 
 ## 온도 단위 변경
 
@@ -505,57 +424,9 @@ Pinia Store를 통해 여러 Component가 동일한 상태를 공유합니다.
 - 기존 기능 유지
 - UI 구조 개선
 
-
-## UnitToggler Component 위치 변경
-
-기존에는 `App.vue`의 Navigation 영역에 `UnitToggler` Component를 배치하여 모든 페이지에서 온도 단위 변경 버튼이 표시되었습니다.
-
-변경 후에는 상세 날씨 정보 화면에서만 온도 단위 변경 기능을 사용할 수 있도록 위치를 변경했습니다.
-
-
-변경 전:
-
-```
-App.vue
-
-↓
-
-UnitToggler
-
-↓
-
-전체 페이지 표시
-```
-
-
-변경 후:
-
-```
-WeatherDetailView.vue
-
-↓
-
-UnitToggler
-
-↓
-
-상세 페이지 표시
-```
-
-
-수정 내용:
-
-- `App.vue`에서 `UnitToggler` Component 제거
-- `WeatherDetailView.vue`에 `UnitToggler` Component 추가
-- 기존 Pinia Store 상태 관리 구조 유지
-- 버튼 동작 방식과 온도 변환 기능 유지
-
-
-이를 통해 메인 화면에서는 날씨 정보 확인에 집중하고, 실제 온도 변환이 필요한 상세 페이지에서만 단위 변경 기능을 사용할 수 있도록 화면 구성을 개선했습니다.
-
 ---
 
-# 12. Source Code 품질관리 및 Build & Deployment
+# 10. Source Code 품질관리 및 Build & Deployment
 
 ## Source Code 품질관리
 
@@ -610,41 +481,49 @@ dist/
 
 ---
 
-# 13. 핵심 학습 내용
+## UnitToggler Component 위치 변경
 
-이번 과제를 통해 Vue Application에서 전역 상태 관리, 외부 API 연동, UI Library 적용 방법을 학습했습니다.
+기존에는 `App.vue`의 Navigation 영역에 `UnitToggler` Component를 배치하여 모든 페이지에서 온도 단위 변경 버튼이 표시되었습니다.
+
+변경 후에는 상세 날씨 정보 화면에서만 온도 단위 변경 기능을 사용할 수 있도록 위치를 변경했습니다.
 
 
-기존 구조:
+변경 전:
 
 ```
-Component
+App.vue
 
 ↓
 
-Props / Emit
+UnitToggler
 
 ↓
 
-데이터 전달
+전체 페이지 표시
 ```
 
 
-개선 구조:
+변경 후:
 
 ```
-Component
+WeatherDetailView.vue
 
 ↓
 
-Pinia Store
+UnitToggler
 
 ↓
 
-공유 상태 관리
+상세 페이지 표시
 ```
 
 
-또한 외부 API를 활용하여 실시간 데이터를 제공하는 방법과 UI Library를 활용한 Component 기반 화면 구성 방법을 학습했습니다.
+수정 내용:
 
-이를 통해 Vue Application의 확장성과 유지보수성을 높이는 구조를 구현했습니다.
+- `App.vue`에서 `UnitToggler` Component 제거
+- `WeatherDetailView.vue`에 `UnitToggler` Component 추가
+- 기존 Pinia Store 상태 관리 구조 유지
+- 버튼 동작 방식과 온도 변환 기능 유지
+
+
+이를 통해 메인 화면에서는 날씨 정보 확인에 집중하고, 실제 온도 변환이 필요한 상세 페이지에서만 단위 변경 기능을 사용할 수 있도록 화면 구성을 개선했습니다.
