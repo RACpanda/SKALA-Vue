@@ -4,6 +4,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useConfigStore } from '@/stores/configStore'
 import { getWeather } from '@/api/weatherApi'
 import { getNews } from '@/api/newsApi'
+import UnitToggler from '@/components/exercise/UnitToggler.vue'
 
 const route = useRoute() // 현재 URL 정보 접근
 const cityId = route.params.id // URL에서 도시 ID 추출
@@ -74,6 +75,9 @@ const displayTemp = computed(() => {
 
 <template>
     <h2>지역별 상세 기상 관측 정보</h2>
+
+    <UnitToggler /> //현재 온도 단위 표시
+
     <v-card v-if="weather">
         <v-card-text>
             <p>지정 지역:{{weather.name}}</p>
@@ -84,17 +88,18 @@ const displayTemp = computed(() => {
     </v-card>
 
     <section v-if="newsList.length">
-        <h3>
-            📰 {{weather.name}} 날씨 뉴스
-        </h3>
+        <div class="news-section">
+            <h3>
+                📰 {{weather.name}} 날씨 뉴스
+            </h3>
+        </div>
 
         <div
         v-for="news in newsList.slice(0,3)"
         :key="news.url"
         class="news-card">
             <h4>{{news.title}}</h4>
-
-            <p>{{news.description}}</p>
+            <p>{{news.description?.slice(0,120)}}...</p>
 
             <a
             :href="news.url"
@@ -105,7 +110,31 @@ const displayTemp = computed(() => {
         </div>
     </section>
 
-    <RouterLink to="/">
+    <RouterLink to="/" class="home-button">
         메인으로 돌아가기
     </RouterLink>
 </template>
+
+<style scoped>
+
+.news-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.news-card {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.news-card h4 {
+  margin-bottom: 8px;
+}
+
+.home-button {
+  display: inline-block;
+  margin-top: 24px;
+}
+</style>

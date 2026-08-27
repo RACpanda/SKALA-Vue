@@ -16,3 +16,30 @@ const emit = defineEmits(['update:modelValue'])
         <p>검색 중인 도시:{{ modelValue }}</p>
     </section>
 </template>
+
+<style scoped>
+
+input {
+
+    width: 350px;
+
+    padding: 12px 16px;
+
+    border: 1px solid #cccccc;
+
+    border-radius: 8px;
+
+    font-size: 16px;
+
+}
+
+
+input:focus {
+
+    outline: none;
+
+    border-color: #666;
+
+}
+
+</style>

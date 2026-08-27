@@ -516,6 +516,48 @@ Pinia Store를 통해 여러 Component가 동일한 상태를 공유합니다.
 - 기존 기능 유지
 - UI 구조 개선
 
+## UnitToggler Component 위치 변경
+
+기존에는 `App.vue`의 Navigation 영역에 `UnitToggler` Component를 배치하여 모든 페이지에서 온도 단위 변경 버튼이 표시되었습니다.
+
+변경 후에는 상세 날씨 정보 화면에서만 온도 단위 변경 기능을 사용할 수 있도록 위치를 변경했습니다.
+
+변경 전:
+
+```
+App.vue
+
+↓
+
+UnitToggler
+
+↓
+
+전체 페이지 표시
+```
+
+변경 후:
+
+```
+WeatherDetailView.vue
+
+↓
+
+UnitToggler
+
+↓
+
+상세 페이지 표시
+```
+
+수정 내용:
+
+- `App.vue`에서 `UnitToggler` Component 제거
+- `WeatherDetailView.vue`에 `UnitToggler` Component 추가
+- 기존 Pinia Store 상태 관리 구조는 유지
+- 버튼 동작 방식과 온도 변환 기능은 기존과 동일하게 유지
+
+이를 통해 메인 화면에서는 날씨 정보 확인에 집중하고, 실제 온도 변환이 필요한 상세 페이지에서만 단위 변경 기능을 사용할 수 있도록 화면 구성을 개선했습니다.
 
 ---
 

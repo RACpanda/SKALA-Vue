@@ -10,7 +10,14 @@
         <li>URL 쿼리 스트링 매핑을 활용한 실시간 검색 상태 동기화</li>
     </ul>
 
-    <RouterLink to="/" class="home-button">
+    <RouterLink  to="/" class="home-button">
         대시보드 홈으로 이동
     </RouterLink>
 </template>
+
+<style scoped>
+.home-button {
+  display: inline-block;
+  margin-top: 24px;
+}
+</style>

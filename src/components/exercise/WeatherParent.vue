@@ -105,12 +105,32 @@ const selectCity = (weather)=>{
 </template>
 
 <style scoped>
-    :global(body) {
-    margin: 0;
-    min-width: 320px;
-    min-height: 100vh;
 
-    background-color: #ffffff;
-    color: #333333;
-    }
+.weather-Mockup {
+
+    max-width: 900px;
+
+    margin: auto;
+
+    padding: 40px;
+
+}
+
+
+.status-bar {
+
+    margin-top: 30px;
+
+    color: #555;
+
+}
+
+
+h2 {
+
+    margin-bottom: 20px;
+
+}
+
+
 </style>

@@ -14,10 +14,19 @@ import UnitToggler from './components/exercise/UnitToggler.vue'; // 온도 단�
       <RouterLink to="/about">
         서비스 소개
       </RouterLink>
-
-      <UnitToggler />
     </nav>
 
     <RouterView />
   </div>
 </template>
+
+<style scoped>
+
+  :global(body){
+
+      background:white;
+
+      color:#333333;
+
+}
+</style>

@@ -10,7 +10,11 @@ import router from './router'
 import 'vuetify/styles'
 
 const app = createApp(App)
-const vuetify = createVuetify()
+const vuetify = createVuetify({
+  theme:{
+    defaultTheme:'light'
+  }
+})
 
 app.use(createPinia())
 app.use(router)
