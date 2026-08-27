@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch, watchEffect } from 'vue'
-import { getWeather } from '@/api/weatherApi'
+import { getWeather } from '@/api/weatherApi.js'
 
 // children import
 import BaseDashboardCard from './BaseDashboardCard.vue'
@@ -14,10 +14,10 @@ const weatherList = ref([])
 const loading = ref(false)
 
 const cityList = [
-  {id:'city_01', name:'서울', lat:37.5665, lon:126.9780},
-  {id:'city_02', name:'수원', lat:37.2636, lon:127.0286},
-  {id:'city_03', name:'부산', lat:35.1796, lon:129.0756},
-  {id:'city_04', name:'인천', lat:37.4563, lon:126.7052}
+  {id:'city_01', name:'서울', region:'서울', lat:37.5665, lon:126.9780},
+  {id:'city_02', name:'수원', region:'경기', lat:37.2636, lon:127.0286},
+  {id:'city_03', name:'부산', region:'부산', lat:35.1796, lon:129.0756},
+  {id:'city_04', name:'인천', region:'인천', lat:37.4563, lon:126.7052}
 ]
 
 const fetchWeather = async () => {

@@ -43,35 +43,3 @@ const emit = defineEmits(['click-card'])
         </div>
     </div>
 </template>
-
-<style scoped>
-.weather-card {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:20px;
-  margin-bottom:12px;
-  background:white;
-  border:1px solid #ddd;
-  border-radius:8px;
-}
-
-.weather-card h3 {
-  margin:0 0 10px;
-}
-
-.weather-card p {
-  margin:5px 0;
-}
-
-button {
-  padding:8px 12px;
-  background:white;
-  border:1px solid #999;
-  border-radius:5px;
-}
-
-button:hover {
-  background:#f2f2f2;
-}
-</style>

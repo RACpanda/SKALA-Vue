@@ -12,10 +12,10 @@ const weather= ref(null)
 const newsList = ref([])
 
 const cityList = {
-    city_01:{name:'서울', lat:37.5665, lon:126.9780},
-    city_02:{name:'수원', lat:37.2636, lon:127.0286},
-    city_03:{name:'부산', lat:35.1796, lon:129.0756},
-    city_04:{name:'인천', lat:37.4563, lon:126.7052}
+    city_01:{name:'서울', region:'서울', lat:37.5665, lon:126.9780},
+    city_02:{name:'수원', region:'경기', lat:37.2636, lon:127.0286},
+    city_03:{name:'부산', region:'부산', lat:35.1796, lon:129.0756},
+    city_04:{name:'인천', region:'인천', lat:37.4563, lon:126.7052}
 }
 
 const city = cityList[cityId]
@@ -39,7 +39,17 @@ const fetchWeather = async () => {
 }
 
 const fetchNews = async () => {
-  newsList.value = await getNews(`${city.name} 날씨`)
+  let result = await getNews(`${city.name} 날씨`)
+
+  if(result.length === 0){
+    result = await getNews(`${city.region} 날씨`)
+  }
+
+  if(result.length === 0){
+    result = await getNews('날씨')
+  }
+
+  newsList.value = result
 }
 
 onMounted(() => {
@@ -50,14 +60,16 @@ onMounted(() => {
 const configStore = useConfigStore()
 
 const displayTemp = computed(() => {
-  const rawTemp = weather.value.temp // 기본 원본 데이터는 섭씨 숫자
+    if(!weather.value) return ''
+        
+    const rawTemp = weather.value.temp // 기본 원본 데이터는 섭씨 숫자
 
-  if (configStore.unit === 'fahrenheit') {
-    return Math.round((rawTemp * 9) / 5 + 32) // 화씨 변환 연산
-  }
-  return Math.round(rawTemp) // 'celsius'일 때는 원본 그대로 반환
+    if (configStore.unit === 'fahrenheit') {
+        return Math.round((rawTemp * 9) / 5 + 32) // 화씨 변환 연산
+    }
+    return Math.round(rawTemp) // 'celsius'일 때는 원본 그대로 반환
+    
 })
-
 </script>
 
 <template>
