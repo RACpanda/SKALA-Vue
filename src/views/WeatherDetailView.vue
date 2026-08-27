@@ -7,10 +7,24 @@ import { getNews } from '@/api/newsApi'
 import UnitToggler from '@/components/exercise/UnitToggler.vue'
 
 const route = useRoute() // 현재 URL 정보 접근
-const cityId = route.params.id // URL에서 도시 ID 추출
+const cityId = route.params.id as keyof typeof cityList // URL에서 도시 ID 추출
 
-const weather= ref(null) // 날씨 데이터 저장
-const newsList = ref([]) // 뉴스 목록 저장
+interface Weather {
+  name:string
+  temp:number
+  humidity:number
+  status:string
+}
+
+const weather = ref<Weather | null>(null) // 날씨 데이터 저장
+
+interface News {
+  url:string
+  title:string
+  description:string
+}
+
+const newsList = ref<News[]>([]) // 뉴스 목록 저장
 
 const cityList = {
     city_01:{name:'서울', region:'서울', lat:37.5665, lon:126.9780},
@@ -21,7 +35,7 @@ const cityList = {
 
 const city = cityList[cityId]
 
-const convertWeatherStatus = (status) => {
+const convertWeatherStatus = (status:string) => {
     if(status.includes('비')) return '비'
     if(status.includes('구름') || status.includes('흐림')) return '구름'
     if(status.includes('맑')) return '맑음'
@@ -89,7 +103,7 @@ const displayTemp = computed(() => {
 
     <section v-if="newsList.length">
         <div class="news-section">
-            <h3>
+            <h3 v-if="weather">
                 📰 {{weather.name}} 날씨 뉴스
             </h3>
         </div>

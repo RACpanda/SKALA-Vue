@@ -1,4 +1,12 @@
 <script setup lang="ts">
+interface Weather {
+  id:string
+  name:string
+  temp:number
+  humidity:number
+  status:string
+}
+
 import { ref, onMounted, computed,} from 'vue'
 import { getWeather } from '@/api/weatherApi.js'
 
@@ -6,7 +14,7 @@ import BaseDashboardCard from './BaseDashboardCard.vue'
 import WeatherCard from './WeatherCard.vue'
 import SearchBar from './SearchBar.vue'
 
-const weatherList = ref([]) // 지역별 날씨 데이터 저장
+const weatherList = ref<Weather[]>([]) // 지역별 날씨 데이터 저장
 const loading = ref(false)
 
 const cityList = [
@@ -16,7 +24,7 @@ const cityList = [
   {id:'city_04', name:'인천', region:'인천', lat:37.4563, lon:126.7052}
 ]
 
-const convertWeatherStatus = (status) => {
+const convertWeatherStatus = (status:string) => {
   if(status.includes('비')) return '비'
   if(status.includes('구름') || status.includes('흐림')) return '흐림'
   if(status.includes('맑')) return '맑음'
@@ -54,7 +62,7 @@ onMounted(()=>{fetchWeather()}) // 화면 생성 후 날씨 데이터 호출
 
 const searchQuery = ref('') // 검색어 저장
 
-const selectedCityInfo = ref(null) // 선택한 도시 저장
+const selectedCityInfo = ref<Weather | null>(null) // 선택한 도시 저장
 
 const filteredWeatherList = computed(() => {
   if (!searchQuery.value) {
@@ -64,7 +72,7 @@ const filteredWeatherList = computed(() => {
     weather =>weather.name.includes(searchQuery.value))
 })
 
-const selectCity = (weather)=>{
+const selectCity = (weather:Weather)=>{
   selectedCityInfo.value = weather}
 
 </script>

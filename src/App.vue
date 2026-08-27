@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import UnitToggler from './components/exercise/UnitToggler.vue'; // 온도 단위 변경 Component
 </script>
 
 <template>

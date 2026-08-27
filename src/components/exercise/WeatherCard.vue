@@ -2,9 +2,18 @@
 import {useRouter} from 'vue-router'
 
 const router = useRouter()
-const props = defineProps({
-  weather:Object
-})
+
+interface Weather {
+  id:string
+  name:string
+  temp:number
+  humidity:number
+  status:string
+}
+
+const props = defineProps<{
+  weather:Weather
+}>()
 
 const detail = ()=>{router.push(`/weather/${props.weather.id}`)} // 상세 페이지 이동
 const emit = defineEmits(['click-card']) // 카드 선택 이벤트 전달
