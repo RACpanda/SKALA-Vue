@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import UnitToggler from './components/exercise/UnitToggler.vue';
+import UnitToggler from './components/exercise/UnitToggler.vue'; // 온도 단위 변경 Component
 </script>
 
 <template>
-  <div class = "app-container">
+  <div class="app-container">
     <h1>과제 4:라우터적용</h1>
 
     <nav>
@@ -15,7 +15,7 @@ import UnitToggler from './components/exercise/UnitToggler.vue';
         서비스 소개
       </RouterLink>
 
-      <UnitToggler></UnitToggler>
+      <UnitToggler />
     </nav>
 
     <RouterView />

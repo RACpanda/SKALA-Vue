@@ -1,5 +1,5 @@
 <template>
-    <div class="dashboard-card">
+    <section class="dashboard-card">
         <slot />
-    </div>
+    </section>
 </template>

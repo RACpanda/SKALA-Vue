@@ -3,13 +3,13 @@ import {useRoute} from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
 import { useConfigStore } from '@/stores/configStore'
 import { getWeather } from '@/api/weatherApi'
-import {getNews} from '@/api/newsApi'
+import { getNews } from '@/api/newsApi'
 
-const route = useRoute()
-const cityId = route.params.id
+const route = useRoute() // 현재 URL 정보 접근
+const cityId = route.params.id // URL에서 도시 ID 추출
 
-const weather= ref(null)
-const newsList = ref([])
+const weather= ref(null) // 날씨 데이터 저장
+const newsList = ref([]) // 뉴스 목록 저장
 
 const cityList = {
     city_01:{name:'서울', region:'서울', lat:37.5665, lon:126.9780},
@@ -57,7 +57,7 @@ onMounted(() => {
     fetchNews()
 })
 
-const configStore = useConfigStore()
+const configStore = useConfigStore() // 온도 단위 Store 연결
 
 const displayTemp = computed(() => {
     if(!weather.value) return ''
@@ -82,34 +82,25 @@ const displayTemp = computed(() => {
     </div>
 
     <section v-if="newsList.length">
-
         <h3>
-        📰 {{weather.name}} 날씨 뉴스
+            📰 {{weather.name}} 날씨 뉴스
         </h3>
 
         <div
         v-for="news in newsList.slice(0,3)"
         :key="news.url"
-        class="news-card"
-        >
+        class="news-card">
+            <h4>{{news.title}}</h4>
 
-            <h4>
-            {{news.title}}
-            </h4>
-
-            <p>
-            {{news.description}}
-            </p>
+            <p>{{news.description}}</p>
 
             <a
             :href="news.url"
-            target="_blank"
-            >
-            기사 보기
+            target="_blank">
+                기사 보기
             </a>
 
         </div>
-
     </section>
 
     <RouterLink to="/">

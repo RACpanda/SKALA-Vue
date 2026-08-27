@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps({modelValue:String})
 
-const emit = defineEmits(['update:modelvalue'])
+const emit = defineEmits(['update:modelValue'])
 </script>
 
 <template>
@@ -12,9 +12,7 @@ const emit = defineEmits(['update:modelvalue'])
         placeholder="검색할 도시 이름 입력"
         :value="modelValue"
         @input="emit('update:modelValue', $event.target.value)"/>
-        <p>
-        검색 중인 도시:
-        {{ modelValue }}
-        </p>
+
+        <p>검색 중인 도시:{{ modelValue }}</p>
     </section>
 </template>

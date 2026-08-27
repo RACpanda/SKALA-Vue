@@ -6,9 +6,8 @@ const props = defineProps({
   weather:Object
 })
 
-const detail = ()=>{router.push(`/weather/${props.weather.id}`)}
-
-const emit = defineEmits(['click-card'])
+const detail = ()=>{router.push(`/weather/${props.weather.id}`)} // 상세 페이지 이동
+const emit = defineEmits(['click-card']) // 카드 선택 이벤트 전달
 </script>
 
 <template>
@@ -36,8 +35,7 @@ const emit = defineEmits(['click-card'])
         <div>
             <button
             type="button"
-            @click.stop="detail"
-            >
+            @click.stop="detail">
             상세보기
             </button>
         </div>
