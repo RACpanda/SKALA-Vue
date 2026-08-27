@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import UnitToggler from './components/exercise/UnitToggler.vue';
+</script>
 
 <template>
   <div class = "app-container">
@@ -12,6 +14,8 @@
       <RouterLink to="/about">
         서비스 소개
       </RouterLink>
+
+      <UnitToggler></UnitToggler>
     </nav>
 
     <RouterView />
