@@ -2,20 +2,25 @@
 
 ## 1. 프로젝트 소개
 
-Vue Router를 적용한 기존 Weather Router 프로젝트에 Pinia를 활용한 전역 상태 관리 기능을 추가한 프로젝트입니다.
+Vue Router를 적용한 기존 Weather Router 프로젝트에 Pinia를 활용한 전역 상태 관리 기능과 외부 API 연동 기능을 추가한 프로젝트입니다.
 
-기존 과제에서는 각 Component와 View 내부에서 상태 데이터를 관리했지만, 여러 화면에서 동일한 데이터를 공유해야 하는 경우 Props 전달이나 이벤트 전달 과정이 복잡해질 수 있습니다.
+기존 과제에서는 Component와 View 내부에서 상태 데이터를 개별적으로 관리했습니다. 하지만 여러 화면에서 동일한 데이터를 공유해야 하는 경우 Props 전달과 Event 전달 과정이 복잡해질 수 있습니다.
 
-이번 과제에서는 Pinia Store를 적용하여 온도 단위 설정을 전역 상태로 관리하고, 여러 Component에서 동일한 상태를 공유할 수 있도록 구조를 개선했습니다.
+이번 과제에서는 Pinia Store를 적용하여 온도 단위 설정을 전역 상태로 관리하고, OpenWeather API와 News API를 활용하여 실시간 날씨 데이터와 관련 뉴스 데이터를 제공하도록 확장했습니다.
+
+또한 Vuetify UI Library를 적용하여 기존 HTML 기반 UI를 Component 기반 구조로 개선했습니다.
 
 주요 구현 내용:
 
 - Pinia Store 생성
-- State를 활용한 전역 상태 관리
+- State 기반 전역 상태 관리
 - Getter를 활용한 계산 데이터 관리
 - Action을 활용한 상태 변경
 - UnitToggle Component 구현
 - 날씨 상세 페이지 온도 단위 변환 적용
+- OpenWeather API 연동
+- News API 연동
+- Vuetify UI Library 적용
 
 
 ---
@@ -24,7 +29,12 @@ Vue Router를 적용한 기존 Weather Router 프로젝트에 Pinia를 활용한
 
 ```
 src
+
 ├── App.vue
+│
+├── api
+│   ├── weatherApi.js
+│   └── newsApi.js
 │
 ├── stores
 │   └── configStore.ts
@@ -43,73 +53,24 @@ src
     └── NotFoundView.vue
 ```
 
-
-## 구조 설명
-
-### stores
-
-전역에서 공유하는 상태를 관리합니다.
-
-- configStore.ts
-
-  - 현재 온도 단위 저장
-  - 온도 단위 표시 값 반환
-  - 온도 단위 변경 기능 제공
-
-
-### components
-
-재사용 가능한 UI Component를 관리합니다.
-
-- UnitToggle.vue
-
-  - 현재 온도 단위 표시
-  - 버튼 클릭을 통한 단위 변경
-
-
-- WeatherCard.vue
-
-  - 지역별 날씨 정보 출력
-  - Store 상태에 따라 온도 표시 변경
-
-
-### views
-
-페이지 단위 Component입니다.
-
-- WeatherHomeView.vue
-
-  - 날씨 대시보드 화면
-
-
-- WeatherDetailView.vue
-
-  - 선택한 도시의 상세 날씨 정보 출력
-  - Store를 이용한 온도 변환 적용
-
-
 ---
 
 # 3. Pinia 설정
 
 ## Pinia 등록
 
-`main.ts`에서 Pinia를 Vue 애플리케이션에 등록합니다.
+`main.ts`에서 Pinia를 Vue Application에 등록합니다.
 
 ```ts
 app.use(createPinia())
 ```
 
-
-Pinia를 등록하면 여러 Component에서 하나의 Store를 공유할 수 있습니다.
+Pinia 등록 이후 여러 Component에서 하나의 Store를 공유할 수 있습니다.
 
 
 ---
 
 # 4. Config Store 구현
-
-온도 단위를 관리하기 위한 Store를 생성했습니다.
-
 
 파일 위치:
 
@@ -117,8 +78,9 @@ Pinia를 등록하면 여러 Component에서 하나의 Store를 공유할 수 �
 src/stores/configStore.ts
 ```
 
+Config Store는 온도 단위 설정을 전역으로 관리합니다.
 
-Store 역할:
+주요 역할:
 
 - 현재 온도 단위 저장
 - 화면 표시용 단위 반환
@@ -131,12 +93,9 @@ Store 역할:
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-
 export const useConfigStore = defineStore('config', () => {
 
-
     const unit = ref('celsius')
-
 
     const unitSymbol = computed(() => {
 
@@ -145,7 +104,6 @@ export const useConfigStore = defineStore('config', () => {
         }
 
         return '°C'
-
     })
 
 
@@ -154,10 +112,10 @@ export const useConfigStore = defineStore('config', () => {
         if(unit.value === 'celsius'){
             unit.value = 'fahrenheit'
         }
+
         else{
             unit.value = 'celsius'
         }
-
     }
 
 
@@ -166,10 +124,8 @@ export const useConfigStore = defineStore('config', () => {
         unitSymbol,
         toggleUnit
     }
-
 })
 ```
-
 
 ---
 
@@ -179,27 +135,21 @@ export const useConfigStore = defineStore('config', () => {
 
 현재 선택된 온도 단위를 저장합니다.
 
-
 ```ts
 const unit = ref('celsius')
 ```
-
 
 저장 값:
 
 ```
 celsius
-
 fahrenheit
 ```
 
 
----
-
 ## Getter
 
 현재 상태를 기반으로 화면 표시용 단위를 반환합니다.
-
 
 ```ts
 const unitSymbol = computed(() => {
@@ -209,10 +159,8 @@ const unitSymbol = computed(() => {
     }
 
     return '°C'
-
 })
 ```
-
 
 결과:
 
@@ -223,12 +171,9 @@ fahrenheit → °F
 ```
 
 
----
-
 ## Action
 
 사용자의 버튼 입력에 따라 상태를 변경합니다.
-
 
 ```ts
 function toggleUnit(){
@@ -236,13 +181,12 @@ function toggleUnit(){
     if(unit.value === 'celsius'){
         unit.value = 'fahrenheit'
     }
+
     else{
         unit.value = 'celsius'
     }
-
 }
 ```
-
 
 동작:
 
@@ -261,17 +205,121 @@ function toggleUnit(){
 
 ---
 
-# 6. UnitToggle Component 구현
+# 6. External API 적용
 
-온도 단위 변경 기능을 별도의 Component로 분리했습니다.
+## OpenWeather API
 
+실시간 날씨 데이터를 제공하기 위해 OpenWeather API를 사용했습니다.
+
+파일 위치:
+
+```
+src/api/weatherApi.js
+```
+
+데이터 흐름:
+
+```
+WeatherDetailView
+
+↓
+
+weatherApi.js
+
+↓
+
+OpenWeather API
+
+↓
+
+날씨 데이터 반환
+```
+
+제공 데이터:
+
+- 현재 기온
+- 습도
+- 날씨 상태
+
+
+API 호출 구조:
+
+```js
+axios.get(BASE_URL,{
+    params:{
+        lat,
+        lon,
+        appid:API_KEY,
+        units:'metric',
+        lang:'kr'
+    }
+})
+```
+
+
+---
+
+## News API
+
+날씨 관련 뉴스 데이터를 제공하기 위해 News API를 추가했습니다.
+
+파일 위치:
+
+```
+src/api/newsApi.js
+```
+
+데이터 흐름:
+
+```
+WeatherDetailView
+
+↓
+
+newsApi.js
+
+↓
+
+News API
+
+↓
+
+뉴스 목록 반환
+```
+
+제공 데이터:
+
+- 뉴스 제목
+- 뉴스 설명
+- 기사 링크
+
+
+검색 방식:
+
+```
+도시명 + 날씨
+
+↓
+
+지역명 + 날씨
+
+↓
+
+날씨
+```
+
+검색 결과가 부족한 지역은 더 넓은 범위로 검색하도록 구성했습니다.
+
+
+---
+
+# 7. UnitToggle Component 구현
 
 파일 위치:
 
 ```
 src/components/exercise/UnitToggle.vue
 ```
-
 
 역할:
 
@@ -291,53 +339,45 @@ configStore.toggleUnit()
 
 ↓
 
-전체 화면 온도 단위 변경
+전체 Component 상태 변경
 ```
 
 
 ---
 
-# 7. WeatherDetailView 적용
+# 8. WeatherDetailView 적용
 
-기존 상세 페이지에서는 저장된 온도 값을 그대로 출력했습니다.
+상세 페이지에서는 Store의 현재 단위 설정에 따라 온도를 변환합니다.
 
-변경 전:
+기존:
 
 ```ts
 weather.temp
 ```
 
-
-변경 후:
+변경:
 
 ```ts
 displayTemp
 ```
 
-
-computed를 활용하여 현재 선택된 단위에 맞게 온도를 변환합니다.
-
+Computed를 활용하여 표시 값을 관리합니다.
 
 ```ts
 const displayTemp = computed(() => {
 
     const rawTemp = weather.temp
 
-
     if(configStore.unit === 'fahrenheit'){
 
         return Math.round(
             (rawTemp * 9) / 5 + 32
         )
-
     }
 
-
     return rawTemp
-
 })
 ```
-
 
 변환 예시:
 
@@ -357,26 +397,69 @@ const displayTemp = computed(() => {
 
 ---
 
-# 8. 데이터 흐름 변경
+# 9. External UI Library 적용
+
+## Vuetify 적용
+
+화면 Component 구조 개선을 위해 Vuetify UI Library를 적용했습니다.
+
+설치:
+
+```bash
+npm install vuetify
+```
+
+
+등록:
+
+```ts
+app.use(vuetify)
+```
+
+
+적용 목적:
+
+기존 HTML 태그 기반 UI를 재사용 가능한 Component 기반 UI 구조로 개선합니다.
+
+
+주요 Component:
+
+|기존 UI|Vuetify Component|
+|---|---|
+|button|v-btn|
+|카드 영역|v-card|
+|입력 영역|v-text-field|
+
+
+적용 범위:
+
+- WeatherCard UI
+- SearchBar 입력 영역
+- UnitToggle 버튼
+- 상세 정보 카드
+
+
+기존 데이터 처리 로직은 유지하고 화면 출력 Component만 개선했습니다.
+
+
+---
+
+# 10. 데이터 흐름
 
 ## 적용 전
 
 ```
-WeatherHomeView
+Component
 
- └ 온도 상태 관리
+↓
 
+Props / Emit
 
-WeatherDetailView
+↓
 
- └ 별도 온도 처리
+데이터 전달
 ```
 
-
-각 페이지에서 개별적으로 상태를 관리하는 구조였습니다.
-
-
----
 
 ## 적용 후
 
@@ -395,44 +478,53 @@ WeatherDetailView
 ```
 
 
-하나의 Store를 여러 Component가 공유하여 동일한 상태를 사용할 수 있도록 개선했습니다.
+Pinia Store를 통해 여러 Component가 동일한 상태를 공유합니다.
 
 
 ---
 
-# 9. 구현 결과
+# 11. 구현 결과
 
-구현된 기능:
+## 온도 단위 변경
 
-
-## 1) 온도 단위 변경
-
-- Navigation Bar의 UnitToggle 버튼 제공
-- 클릭 시 섭씨/화씨 전환
+- UnitToggle 버튼 제공
+- 섭씨/화씨 전환
 
 
-## 2) 날씨 대시보드 적용
+## 날씨 대시보드
 
-- Store의 현재 단위를 기준으로 온도 표시
-
-
-## 3) 상세 날씨 페이지 적용
-
-- Dynamic Route 기반 상세 페이지에서도 동일한 단위 적용
+- OpenWeather API 기반 실시간 날씨 출력
+- 지역별 날씨 정보 표시
 
 
-## 4) 전역 상태 공유
+## 상세 페이지
 
-- 여러 Component가 하나의 Store 데이터 사용
+- Dynamic Route 기반 상세 정보 출력
+- Store 기반 온도 변환 적용
+
+
+## 뉴스 기능
+
+- News API 연동
+- 날씨 관련 뉴스 출력
+- 기사 링크 제공
+
+
+## UI 개선
+
+- Vuetify Component 적용
+- 기존 기능 유지
+- UI 구조 개선
 
 
 ---
 
-# 10. 과제5 핵심 학습 내용
+# 12. 핵심 학습 내용
 
-이번 과제를 통해 Pinia를 활용한 Vue 전역 상태 관리 구조를 구현했습니다.
+이번 과제를 통해 Vue Application에서 전역 상태 관리, 외부 API 연동, UI Library 적용 방법을 학습했습니다.
 
-기존 Component 중심 구조:
+
+기존 구조:
 
 ```
 Component
@@ -446,10 +538,8 @@ Props / Emit
 데이터 전달
 ```
 
-에서
 
-
-Pinia 적용 후:
+개선 구조:
 
 ```
 Component
@@ -463,7 +553,8 @@ Pinia Store
 공유 상태 관리
 ```
 
-구조로 변경했습니다.
 
+또한 외부 API를 활용하여 실시간 데이터를 제공하는 방법과 UI Library를 활용한 Component 기반 화면 구성 방법을 학습했습니다.
 
-이를 통해 여러 페이지와 Component에서 공통으로 사용하는 데이터를 효율적으로 관리할 수 있으며, Vue 애플리케이션의 확장성과 유지보수성을 높이는 방법을 학습했습니다.
+이를 통해 Vue Application의 확장성과 유지보수성을 높이는 구조를 구현했습니다.
+```
