@@ -11,7 +11,7 @@ const emit = defineEmits(['click-card']) // 카드 선택 이벤트 전달
 </script>
 
 <template>
-    <div class = "weather-card"
+    <v-card class="pa-4"
     @click="emit('click-card', weather)">
 
         <div >
@@ -39,5 +39,5 @@ const emit = defineEmits(['click-card']) // 카드 선택 이벤트 전달
             상세보기
             </button>
         </div>
-    </div>
+    </v-card>
 </template>

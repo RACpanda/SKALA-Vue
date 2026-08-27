@@ -74,12 +74,14 @@ const displayTemp = computed(() => {
 
 <template>
     <h2>지역별 상세 기상 관측 정보</h2>
-    <div v-if="weather">
-        <p>지정 지역:{{weather.name}}</p>
-        <p>실시간 기온:{{displayTemp }}{{ configStore.unitSymbol }}</p>
-        <p>대기 습도:{{weather.humidity}}%</p>
-        <p>기상 현황:{{weather.status}}</p>
-    </div>
+    <v-card v-if="weather">
+        <v-card-text>
+            <p>지정 지역:{{weather.name}}</p>
+            <p>실시간 기온:{{displayTemp }}{{ configStore.unitSymbol }}</p>
+            <p>대기 습도:{{weather.humidity}}%</p>
+            <p>기상 현황:{{weather.status}}</p>
+        </v-card-text>
+    </v-card>
 
     <section v-if="newsList.length">
         <h3>
