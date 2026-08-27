@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect } from 'vue'
+import { ref, onMounted, computed, watch, watchEffect } from 'vue'
+import { getWeather } from '@/api/weatherApi'
 
 // children import
 import BaseDashboardCard from './BaseDashboardCard.vue'
@@ -9,12 +10,43 @@ import SearchBar from './SearchBar.vue'
 // WeatherParent : 지역별 날씨 현황 목록과 반응형 로직 포함
 
 //지역별 날씨 현황 목록
-const weatherList = ref([
-  {id: 'city_01', name: '서울',temp: 28, status: '맑음',humidity: 45,},
-  {id: 'city_02',name: '수원', temp: 24, status: '비', humidity: 72,},
-  {id: 'city_03',name: '부산', temp: 26, status: '구름', humidity: 60,},
-  {id: 'city_04',name: '인천', temp: 22, status: '맑음', humidity: 32,},
-])
+const weatherList = ref([])
+const loading = ref(false)
+
+const cityList = [
+  {id:'city_01', name:'서울', lat:37.5665, lon:126.9780},
+  {id:'city_02', name:'수원', lat:37.2636, lon:127.0286},
+  {id:'city_03', name:'부산', lat:35.1796, lon:129.0756},
+  {id:'city_04', name:'인천', lat:37.4563, lon:126.7052}
+]
+
+const fetchWeather = async () => {
+  loading.value = true
+
+  try {
+    const result = []
+
+    for(const city of cityList) {
+      const data = await getWeather(city.lat, city.lon)
+      
+      result.push({
+        id: city.id,
+        name: city.name,
+        temp: data.main.temp,
+        humidity: data.main.humidity,
+        status: data.weather[0].description
+      })
+    }
+    weatherList.value = result
+
+  } catch(error) {
+    console.log(error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(()=>{fetchWeather()})
 
 //검색어
 const searchQuery = ref('')
