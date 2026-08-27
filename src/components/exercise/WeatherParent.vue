@@ -135,8 +135,8 @@ const selectCity = (weather:Weather)=>{
 
 
 h2 {
-
-    margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 
 }
 
