@@ -480,8 +480,9 @@ dist/
 생성된 Build 결과물을 기반으로 Hosting 환경에서 배포 가능한 형태로 구성했습니다.
 
 ---
+---
 
-## UnitToggler Component 위치 변경
+# 추가 사항. UnitToggler Component 위치 변경
 
 기존에는 `App.vue`의 Navigation 영역에 `UnitToggler` Component를 배치하여 모든 페이지에서 온도 단위 변경 버튼이 표시되었습니다.
 
