@@ -3,11 +3,13 @@ import {useRoute} from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
 import { useConfigStore } from '@/stores/configStore'
 import { getWeather } from '@/api/weatherApi'
+import {getNews} from '@/api/newsApi'
 
 const route = useRoute()
 const cityId = route.params.id
 
-const weather= ref([])
+const weather= ref(null)
+const newsList = ref([])
 
 const cityList = {
     city_01:{name:'서울', lat:37.5665, lon:126.9780},
@@ -17,6 +19,13 @@ const cityList = {
 }
 
 const city = cityList[cityId]
+
+const convertWeatherStatus = (status) => {
+    if(status.includes('비')) return '비'
+    if(status.includes('구름') || status.includes('흐림')) return '구름'
+    if(status.includes('맑')) return '맑음'
+    return status
+}
 
 const fetchWeather = async () => {
     const data = await getWeather(city.lat, city.lon)
@@ -29,8 +38,13 @@ const fetchWeather = async () => {
     })
 }
 
+const fetchNews = async () => {
+  newsList.value = await getNews(`${city.name} 날씨`)
+}
+
 onMounted(() => {
-  fetchWeather()
+    fetchWeather()
+    fetchNews()
 })
 
 const configStore = useConfigStore()
@@ -44,22 +58,47 @@ const displayTemp = computed(() => {
   return Math.round(rawTemp) // 'celsius'일 때는 원본 그대로 반환
 })
 
-const convertWeatherStatus = (status) => {
-    if(status.includes('비')) return '비'
-    if(status.includes('구름') || status.includes('흐림')) return '구름'
-    if(status.includes('맑')) return '맑음'
-    return status
-}
 </script>
 
 <template>
     <h2>지역별 상세 기상 관측 정보</h2>
-    <div>
+    <div v-if="weather">
         <p>지정 지역:{{weather.name}}</p>
         <p>실시간 기온:{{displayTemp }}{{ configStore.unitSymbol }}</p>
         <p>대기 습도:{{weather.humidity}}%</p>
         <p>기상 현황:{{weather.status}}</p>
     </div>
+
+    <section v-if="newsList.length">
+
+        <h3>
+        📰 {{weather.name}} 날씨 뉴스
+        </h3>
+
+        <div
+        v-for="news in newsList.slice(0,3)"
+        :key="news.url"
+        class="news-card"
+        >
+
+            <h4>
+            {{news.title}}
+            </h4>
+
+            <p>
+            {{news.description}}
+            </p>
+
+            <a
+            :href="news.url"
+            target="_blank"
+            >
+            기사 보기
+            </a>
+
+        </div>
+
+    </section>
 
     <RouterLink to="/">
         메인으로 돌아가기
